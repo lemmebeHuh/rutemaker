@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Forgery Request</title>
+  <link rel="stylesheet" href="css/client.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background-canvas">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <header class="header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+        <span>Activity Forge <span class="tag">Client Portal</span></span>
+      </div>
+      <p class="subtitle">Submit your custom activity request</p>
+    </header>
+
+    <main class="main-content">
+      <form id="order-form" class="glass-panel">
+        
+        <div class="form-section">
+          <h2 class="section-title">1. Basic Details</h2>
+          <div class="input-group">
+            <label for="client-name">Your Name</label>
+            <input type="text" id="client-name" class="glass-input" placeholder="e.g. John Doe" required>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">2. Activity Parameters</h2>
+          
+          <div class="input-row">
+            <div class="input-group">
+              <label for="sport-type">Sport Type</label>
+              <select id="sport-type" class="glass-input" required>
+                <option value="Running">Running</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Walking">Walking</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="start-time">Date & Start Time</label>
+              <input type="datetime-local" id="start-time" class="glass-input" required>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="target-dist">Distance (km)</label>
+              <input type="number" id="target-dist" class="glass-input" step="0.1" placeholder="e.g. 5.5" required>
+            </div>
+            <div class="input-group">
+              <label for="target-pace">Target Pace/Speed</label>
+              <input type="text" id="target-pace" class="glass-input" placeholder="e.g. 6:30 /km or 25 km/h" required>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="route-desc">Location / Route Description</label>
+            <textarea id="route-desc" class="glass-input" rows="3" placeholder="e.g. Start at lengkong, run 2 loops counter-clockwise..." required></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">3. Realism Options</h2>
+          
+          <div class="input-group">
+            <label for="spoof-device">Spoofed Recording Device</label>
+            <select id="spoof-device" class="glass-input">
+              <optgroup label="Garmin">
+                <option value="Garmin Forerunner 945">Garmin Forerunner 945</option>
+                <option value="Garmin Forerunner 245">Garmin Forerunner 245</option>
+                <option value="Garmin Edge 530">Garmin Edge 530 (Cycling)</option>
+                <option value="Garmin Fenix 7">Garmin Fenix 7</option>
+              </optgroup>
+              <optgroup label="Apple">
+                <option value="Apple Watch Ultra">Apple Watch Ultra</option>
+              </optgroup>
+              <optgroup label="Coros">
+                <option value="COROS PACE 3">COROS PACE 3</option>
+              </optgroup>
+              <optgroup label="Huawei">
+                <option value="HUAWEI WATCH FIT 3">HUAWEI WATCH FIT 3</option>
+              </optgroup>
+              <option value="None">None (Strava App)</option>
+            </select>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="avg-hr">Average HR (BPM)</label>
+              <input type="number" id="avg-hr" class="glass-input" placeholder="e.g. 145" value="145">
+            </div>
+            <div class="input-group">
+              <label for="max-hr">Max HR (BPM)</label>
+              <input type="number" id="max-hr" class="glass-input" placeholder="e.g. 180" value="180">
+            </div>
+          </div>
+          
+          <div class="input-group checkbox-group">
+            <input type="checkbox" id="add-stops" checked>
+            <label for="add-stops">Simulate natural stops (traffic lights, water breaks)</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-submit">
+          <span>Send Request via WhatsApp</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+    </main>
+  </div>
+
+  <script src="js/client.js"></script>
+</body>
+</html>
