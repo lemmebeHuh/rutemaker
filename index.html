@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Joki Strava - Layanan Profesional</title>
+  <title>ruteu. - Jasa Pelari & Pesepeda</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,6 +11,8 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent: #3b82f6;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.05);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -20,159 +22,266 @@
       overflow-x: hidden;
       line-height: 1.6;
     }
+    
+    /* Background */
     .background-canvas {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: -1;
       background: radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15), var(--bg-dark) 70%);
     }
+
+    /* Navbar */
     header {
-      padding: 40px 20px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
+      padding: 24px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    .logo { font-family: 'Inter', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -1px;  }
+    .logo { 
+      font-size: 28px; 
+      font-weight: 800; 
+      letter-spacing: -1.5px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Hero */
     .hero {
-      min-height: 80vh;
+      padding: 80px 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0 20px;
     }
-    h1 {\n      font-family: 'Inter', sans-serif;\n      \n      letter-spacing: -1px;
-      font-size: clamp(40px, 8vw, 72px);
+    h1 {
+      font-size: clamp(32px, 6vw, 56px);
       font-weight: 800;
       line-height: 1.1;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
       background: linear-gradient(to right, #fff, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     p.subtitle {
-      font-size: clamp(18px, 4vw, 24px);
+      font-size: clamp(16px, 3vw, 20px);
       color: var(--text-muted);
-      max-width: 600px;
-      margin-bottom: 48px;
+      max-width: 550px;
+      margin-bottom: 40px;
     }
+    
     .cta-button {
       display: inline-flex;
       align-items: center;
       gap: 12px;
       background: var(--text-main);
       color: var(--bg-dark);
-      padding: 18px 40px;
+      padding: 16px 32px;
       border-radius: 100px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       text-decoration: none;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .cta-button:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 15px 30px rgba(255, 255, 255, 0.15);
     }
-    .features {
+
+    /* Cards Grid */
+    .section-title {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 30px;
+      letter-spacing: -1px;
+    }
+    
+    .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
       max-width: 1000px;
-      margin: 0 auto 100px;
+      margin: 0 auto 80px;
       padding: 0 20px;
     }
-    .feature-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 32px;
-      border-radius: 24px;
+
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 30px;
+      border-radius: 20px;
       text-align: left;
+      transition: transform 0.3s ease, background 0.3s ease;
     }
-    .feature-card h3 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 8px; letter-spacing: 1px;  }
-    .feature-card p { color: var(--text-muted); font-size: 15px; }
+    .info-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .info-card h3 { 
+      font-size: 20px; 
+      margin-bottom: 12px; 
+      letter-spacing: -0.5px; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px;
+    }
+    .info-card p { 
+      color: var(--text-muted); 
+      font-size: 15px; 
+    }
+    
+    .step-card-ui {
+      text-align: center;
+    }
+    .step-card-ui .icon-wrap {
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    .step-card-ui h4 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .footer-links {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      header { padding: 20px; }
+      .hero { padding: 60px 20px; }
+    }
   </style>
 </head>
 <body>
   <div class="background-canvas"></div>
   
+  <!-- Header -->
   <header>
-    <div class="logo">Joki Strava</div>
+    <a href="index.html" class="logo">ruteu.</a>
+    <a href="daftar.html" class="nav-cta">Pesan Sekarang</a>
   </header>
 
-  
   <main>
+    <!-- Hero -->
     <section class="hero">
       <h1>Biar Kami yang Keringetan,<br>Kamu Tinggal Pamer.</h1>
-      <p class="subtitle">Layanan Joki Strava paling sat-set. Kamu tinggal tentuin mau lari atau gowes di mana, jaraknya berapa, pace-nya seberapa cepet. Biar joki kita yang beresin semuanya di lapangan.</p>
+      <p class="subtitle">Layanan ruteu paling sat-set. Tentukan mau lari atau gowes di mana, jarak, & pace-nya. Joki lapangan kami yang beresin semuanya.</p>
       <a href="daftar.html" class="cta-button">
-        Pesen Sekarang
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        Buat Orderan
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       </a>
     </section>
 
-    <section class="features">
-      <div class="feature-card">
-        <h3 style="display: flex; align-items: center; gap: 10px;">
+    <!-- Point Utama -->
+    <section class="grid-container">
+      <div class="info-card">
+        <h3>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
           Rute Suka-Suka
         </h3>
-        <p>Bebas mau mulai dari mana, finish di mana. Tinggal share lokasinya, joki kita yang bakal lari atau sepedaan di sana.</p>
+        <p>Bebas mau mulai dari mana, finish di mana. Tinggal share lokasinya, pelari kita yang bakal kerjain di sana.</p>
       </div>
-      <div class="feature-card">
-        <h3 style="display: flex; align-items: center; gap: 10px;">
+      <div class="info-card">
+        <h3>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           Pace Bebas Atur
         </h3>
         <p>Mau pace santai buat recovery atau pace kenceng buat pamer? Bisa banget. Kasih tau aja target waktunya, kita yang kejar.</p>
       </div>
-      <div class="feature-card">
-        <h3 style="display: flex; align-items: center; gap: 10px;">
+      <div class="info-card">
+        <h3>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.5 7.5L18 3h-12l1.5 4.5"></path><path d="M7.5 16.5L6 21h12l-1.5-4.5"></path></svg>
           Rekaman Jam Asli
         </h3>
-        <p>Aktivitas kamu direkam pakai smartwatch beneran (kayak Garmin). Jadi data GPS sama detak jantungnya kelihatan mulus dan asli.</p>
+        <p>Aktivitas kamu direkam pakai smartwatch beneran (seperti Garmin). Jadi data GPS & detak jantung kelihatan mulus dan natural.</p>
       </div>
     </section>
   
-    <section class="how-it-works" style="max-width: 1000px; margin: 0 auto 100px; padding: 0 20px;">
-      <h2 style="font-family: 'Inter', sans-serif; font-size: 32px; text-align: center; margin-bottom: 40px; letter-spacing: -1px;">Cara Pesan</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-        
-        <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
-          <div style="margin-bottom: 12px; color: var(--accent);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-          </div>
-          <h4 style="font-size: 18px; margin-bottom: 8px;">1. Chat & Bayar</h4>
-          <p style="color: var(--text-muted); font-size: 14px;">Isi form order buat ngasih tau kita detail lari/gowes yang kamu mau, terus lanjut bayar via WhatsApp.</p>
+    <!-- Cara Pesan -->
+    <h2 class="section-title">Cara Pesan</h2>
+    <section class="grid-container">
+      <div class="info-card step-card-ui">
+        <div class="icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
         </div>
-        
-        <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
-          <div style="margin-bottom: 12px; color: var(--accent);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-          </div>
-          <h4 style="font-size: 18px; margin-bottom: 8px;">2. Izin Login</h4>
-          <p style="color: var(--text-muted); font-size: 14px;">Kita butuh login sebentar ke akun Strava kamu. Nanti kamu tinggal kasih kode OTP dari email.</p>
+        <h4>1. Chat & Bayar</h4>
+        <p>Isi form order buat ngasih tau kita detail lari/gowes yang dimau, terus lunasi tagihan via WhatsApp.</p>
+      </div>
+      
+      <div class="info-card step-card-ui">
+        <div class="icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
         </div>
-        
-        <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
-          <div style="margin-bottom: 12px; color: var(--accent);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4h.01"></path><path d="M4 17l5-4-2-4 3.5-3.5 2 2 3.5-1.5"></path><path d="M17 19l-3-4 1-5"></path></svg>
-          </div>
-          <h4 style="font-size: 18px; margin-bottom: 8px;">3. Dieksekusi</h4>
-          <p style="color: var(--text-muted); font-size: 14px;">Joki kita langsung turun ke jalan buat ngerjain orderan kamu sesuai target yang dikasih.</p>
+        <h4>2. Izin Login</h4>
+        <p>Kita butuh login sebentar ke akun Strava kamu. Nanti kamu tinggal kasih kode OTP dari email.</p>
+      </div>
+      
+      <div class="info-card step-card-ui">
+        <div class="icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4h.01"></path><path d="M4 17l5-4-2-4 3.5-3.5 2 2 3.5-1.5"></path><path d="M17 19l-3-4 1-5"></path></svg>
         </div>
-        
-        <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
-          <div style="margin-bottom: 12px; color: var(--accent);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          </div>
-          <h4 style="font-size: 18px; margin-bottom: 8px;">4. Beres Deh!</h4>
-          <p style="color: var(--text-muted); font-size: 14px;">Aktivitas langsung muncul di Strava kamu. Siap-siap aja kebanjiran Kudos dari circle kamu!</p>
+        <h4>3. Dieksekusi</h4>
+        <p>Pelari lapangan kita bakal langsung turun ke jalan buat ngeksekusi rute sesuai pesanan.</p>
+      </div>
+      
+      <div class="info-card step-card-ui">
+        <div class="icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
-        
+        <h4>4. Beres Deh!</h4>
+        <p>Aktivitas langsung muncul di feed kamu. Siap-siap kebanjiran Kudos dari followers kamu!</p>
       </div>
     </section>
   </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 ruteu. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="https://instagram.com" target="_blank">Instagram</a>
+      <a href="https://tiktok.com" target="_blank">TikTok</a>
+      <a href="daftar.html">Order Sekarang</a>
+    </div>
+  </footer>
 </body>
 </html>
