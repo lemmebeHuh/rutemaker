@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script>
+  const pwd = prompt("Enter Admin Password:");
+  if (pwd !== "kalamales") {
+    document.write("Access Denied.");
+    window.location.href = "index.html";
+  }
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FakeStrava � Realistic Activity Generator</title>
