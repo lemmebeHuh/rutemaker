@@ -33,6 +33,12 @@
 
     /* Navbar */
     header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -59,7 +65,8 @@
       font-weight: 600;
       text-decoration: none;
       transition: background 0.2s;
-    }
+      opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s; }
+.nav-cta.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
     .nav-cta:hover {
       background: rgba(255,255,255,0.2);
     }
@@ -198,7 +205,7 @@
   <!-- Header -->
   <header>
     <a href="index.html" class="logo">ruteu.</a>
-    <a href="daftar.html" class="nav-cta">Pesan Sekarang</a>
+    <a href="daftar.html" class="nav-cta" id="header-cta">Pesan Sekarang</a>
   </header>
 
   <main>
@@ -275,13 +282,32 @@
   </main>
 
   <!-- Footer -->
+  
   <footer>
-    <p>&copy; 2024 ruteu. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="https://instagram.com" target="_blank">Instagram</a>
-      <a href="https://tiktok.com" target="_blank">TikTok</a>
-      <a href="daftar.html">Order Sekarang</a>
-    </div>
+    <p>&copy; 2026 ruteu. All rights reserved.</p>
   </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const heroCta = document.querySelector(".hero .cta-button");
+      const headerCta = document.getElementById("header-cta");
+      
+      if (heroCta && headerCta) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+              // Hero button is out of view, show header button
+              headerCta.classList.add("visible");
+            } else {
+              // Hero button is in view, hide header button
+              headerCta.classList.remove("visible");
+            }
+          });
+        }, { threshold: 0 });
+        
+        observer.observe(heroCta);
+      }
+    });
+  </script>
 </body>
 </html>
