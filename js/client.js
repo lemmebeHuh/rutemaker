@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hour: '2-digit', minute:'2-digit' 
     });
 
-    let message = `*New Activity Request* 🏃‍♂️🚴‍♀️
+    let message = `*New Activity Request*
 ---------------------------
 *Name:* ${name}
 *Sport:* ${sport}
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     message += `\n---------------------------
 *TOTAL BIAYA:* ${window.currentInvoiceTotal}
 ---------------------------
-Mohon diproses ya kak! 🙏`;
+Mohon diproses ya kak!`;
 
     const waNumber = "6285795603927"; 
     const encodedMessage = encodeURIComponent(message);

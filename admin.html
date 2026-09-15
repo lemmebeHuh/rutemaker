@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FakeStrava � Realistic Activity Generator</title>
+  <meta name="description" content="Generate realistic TCX activity files for Strava. Upload existing routes or draw new ones with road-snapping.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>T</text></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="app-logo">
+        <span class="logo-icon">Forge</span>
+        <div><h1>FakeStrava</h1></div>
+        <span class="version">v2.0</span>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="upload" id="tab-upload">Upload TCX</button>
+        <button class="mode-tab" data-mode="draw" id="tab-draw">Draw Route</button>
+      </div>
+    </header>
+
+    <div class="main-grid">
+      <!-- Left Panel: Controls & Upload -->
+      <div class="left-panel">
+        
+        <div class="upload-panel glass-panel animate-in" id="upload-panel">
+          <div class="panel-title"> Activity Source</div>
+          <div class="sport-selector" id="sport-selector">
+            <button class="sport-btn active" data-sport="Biking">Cycling</button>
+            <button class="sport-btn" data-sport="Running">Running</button>
+            <button class="sport-btn" data-sport="Walking">Walking</button>
+          </div>
+          <div class="control-group" style="margin-top: 15px; margin-bottom: 15px; flex-direction: column; align-items: flex-start;">
+            <div class="control-label" style="margin-bottom: 5px;">Recording Device (Spoofing)</div>
+            <select id="ctrl-device" class="glass-input" style="width: 100%; padding: 8px;">
+              <option value="None">None (No Spoofing)</option>
+              <optgroup label="Garmin">
+                <option value="Garmin Forerunner 945">Garmin Forerunner 945</option>
+                <option value="Garmin Forerunner 245">Garmin Forerunner 245</option>
+                <option value="Garmin Fenix 7">Garmin Fenix 7</option>
+                <option value="Garmin Epix Gen 2">Garmin Epix Gen 2</option>
+                <option value="Garmin Edge 530">Garmin Edge 530 (Cycling)</option>
+              </optgroup>
+              <optgroup label="Coros">
+                <option value="COROS PACE 2">COROS PACE 2</option>
+                <option value="COROS PACE 3">COROS PACE 3</option>
+                <option value="COROS APEX Pro 2">COROS APEX Pro 2</option>
+              </optgroup>
+              <optgroup label="Huawei">
+                <option value="HUAWEI WATCH FIT">HUAWEI WATCH FIT</option>
+                <option value="HUAWEI WATCH GT 3">HUAWEI WATCH GT 3</option>
+              </optgroup>
+              <optgroup label="Apple">
+                <option value="Apple Watch Ultra">Apple Watch Ultra</option>
+                <option value="Apple Watch Series 8">Apple Watch Series 8</option>
+              </optgroup>
+              <optgroup label="Wahoo">
+                <option value="Wahoo ELEMNT BOLT">Wahoo ELEMNT BOLT</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="Strava Android App">Strava Mobile App</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="upload-zone" id="upload-zone">
+            <span class="upload-icon">Upload</span>
+            <div class="upload-text">Drop TCX file here or click to browse</div>
+            <div class="upload-hint">.tcx or .gpx files from Strava, Garmin, etc.</div>
+          </div>
+          <input type="file" id="file-input" accept=".tcx,.gpx">
+
+          <div class="draw-mode-banner" id="draw-mode-banner">
+            Click map to add waypoints. Right-click marker to remove.
+          </div>
+
+          <div id="draw-controls" style="display:none; margin-top:12px;">
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-sm btn-block" id="btn-edit-uploaded" style="display:none;">Edit This Route</button>
+            </div>
+            <div class="route-info" id="route-info">
+              Route: <span class="route-distance" id="route-distance">0 km</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-panel glass-panel animate-in" id="controls-panel" style="animation-delay: 0.1s; margin-top: var(--space-md);">
+          <div class="panel-title"> Modifications</div>
+          
+          <div class="accordion">
+            <!-- Time & Speed -->
+            <div class="accordion-item active">
+              <button class="accordion-header">Time & Speed</button>
+              <div class="accordion-content">
+                <div class="control-group">
+                  <div class="control-label"><span>Start Date & Time</span></div>
+                  <input type="datetime-local" id="ctrl-start-time">
+                </div>
+                <div class="control-group" style="align-items: center;">
+                    <div class="control-label">Target Speed (km/h) / Pace (min/km)</div>
+                    <input type="number" id="ctrl-target-speed" min="1" max="100" step="0.1" value="25" style="width: 80px; padding: 4px; border: 1px solid var(--border-glass); border-radius: 4px; background: var(--bg-tertiary); color: var(--text-primary); text-align: center;">
+                  </div>
+              </div>
+            </div>
+
+            <!-- Route Adjustments -->
+            <div class="accordion-item">
+              <button class="accordion-header">Route Adjustments</button>
+              <div class="accordion-content">
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-reverse">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Reverse Direction</span>
+                  </label>
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>Trim Start</span><span class="control-value" id="trim-start-value">0%</span></div>
+                  <input type="range" id="ctrl-trim-start" min="0" max="50" step="1" value="0">
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>Trim End</span><span class="control-value" id="trim-end-value">100%</span></div>
+                  <input type="range" id="ctrl-trim-end" min="50" max="100" step="1" value="100">
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>Loop Count</span></div>
+                  <input type="number" id="ctrl-loop-count" min="1" step="1" value="1" style="width: 80px; text-align: right;">
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>Elevation Offset</span><span class="control-value" id="elev-offset-value">0m</span></div>
+                  <input type="range" id="ctrl-elev-offset" min="-200" max="200" step="5" value="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Realism Engine -->
+            <div class="accordion-item">
+              <button class="accordion-header">Realism Engine</button>
+              <div class="accordion-content">
+                <div class="control-group" id="pacing-group" style="display:none;">
+                  <div class="control-label"><span>Pacing Strategy</span></div>
+                  <select id="ctrl-pacing-strategy" class="glass-input" style="width: 100%; margin-top: 4px;">
+                    <option value="even">Even Pacing (Flat)</option>
+                    <option value="negative">Negative Split (Slow to Fast)</option>
+                    <option value="positive">Positive Split (Fast to Slow)</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>GPS Jitter</span><span class="control-value" id="gps-jitter-value">50%</span></div>
+                  <input type="range" id="ctrl-gps-jitter" min="0" max="100" step="5" value="50">
+                </div>
+                <div class="control-group">
+                  <div class="control-label"><span>Speed Noise</span><span class="control-value" id="speed-noise-value">50%</span></div>
+                  <input type="range" id="ctrl-speed-noise" min="0" max="100" step="5" value="50">
+                </div>
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-add-stops" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Natural Stops <small style="display:block; font-size:0.7em; color:var(--text-tertiary); font-weight:normal; margin-top:2px; line-height:1.2;">(Menambahkan jeda diam acak 10-40 detik seperti berhenti di lampu merah)</small></span>
+                  </label>
+                </div>
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-warmup" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Warm-up / Cool-down</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Heart Rate -->
+            <div class="accordion-item">
+              <button class="accordion-header">Heart Rate</button>
+              <div class="accordion-content hr-settings">
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-hr-enabled" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Generate Heart Rate</span>
+                  </label>
+                </div>
+                <div id="hr-controls">
+                  <div class="control-group">
+                    <div class="control-label"><span>Target Avg HR</span><span class="control-value" id="target-hr-value">145 bpm</span></div>
+                    <input type="range" id="ctrl-target-hr" min="100" max="190" step="1" value="145">
+                  </div>
+                  <div class="control-group">
+                    <div class="control-label"><span>Max HR</span><span class="control-value" id="max-hr-value">190 bpm</span></div>
+                    <input type="range" id="ctrl-max-hr" min="150" max="220" step="1" value="190">
+                  </div>
+                  <div class="control-group">
+                    <div class="control-label"><span>Resting HR</span><span class="control-value" id="resting-hr-value">70 bpm</span></div>
+                    <input type="range" id="ctrl-resting-hr" min="40" max="100" step="1" value="70">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="control-group" style="margin-top: 15px; flex-direction: column; align-items: flex-start;">
+            <div class="control-label" style="margin-bottom: 5px;">Export Format</div>
+            <select id="ctrl-format" class="glass-input" style="width: 100%; padding: 8px;">
+              <option value="fit">.FIT (Recommended - Best Device Spoofing)</option>
+              <option value="tcx">.TCX (Legacy XML)</option>
+            </select>
+          </div>
+          <button class="btn btn-success btn-lg btn-block btn-generate" id="btn-generate" disabled style="margin-top:10px;">
+            Generate & Download
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Panel: Map & Stats -->
+      <div class="right-panel">
+        <div class="map-panel glass-panel animate-in" id="map-panel" style="animation-delay: 0.2s">
+          <div class="map-toolbar-wrapper">
+            <div id="map-container"></div>
+            <!-- Map Overlay Controls -->
+            <div class="map-toolbar">
+              <button class="btn btn-outline btn-sm" id="btn-freehand" title="Draw freehand shape" style="display:none;">Freehand</button><button class="btn btn-outline btn-sm" id="btn-undo" title="Undo" disabled>Undo</button>
+              <button class="btn btn-outline btn-sm" id="btn-redo" title="Redo" disabled>Redo</button>
+              <button class="btn btn-outline btn-sm" id="btn-snap-roads" title="Toggle road snapping" style="display:none;">Snap: ON</button>
+              <button class="btn btn-outline btn-sm" id="btn-clear-waypoints" style="margin-left: 8px;">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-panel glass-panel animate-in" style="animation-delay: 0.3s; margin-top: var(--space-md);">
+          <div style="display:flex; justify-content:space-between;">
+            <div style="flex:1;">
+              <div class="panel-title"> Original Stats</div>
+              <div class="stats-grid" id="original-stats">
+                <div class="stat-card"><div class="stat-label">Dist</div><div class="stat-value" id="stat-distance">--<span class="stat-unit">km</span></div></div>
+                <div class="stat-card"><div class="stat-label">Total Time</div><div class="stat-value" id="stat-duration">--:--</div></div>
+                <div class="stat-card"><div class="stat-label">Moving Time</div><div class="stat-value" id="stat-moving-time">--:--</div></div>
+                <div class="stat-card"><div class="stat-label" id="lbl-orig-avg-spd">Avg Spd</div><div class="stat-value" id="stat-avg-speed">--<span class="stat-unit">km/h</span></div></div>
+                <div class="stat-card"><div class="stat-label" id="lbl-orig-max-spd">Max Spd</div><div class="stat-value" id="stat-max-speed">--<span class="stat-unit">km/h</span></div></div>
+                <div class="stat-card"><div class="stat-label">Elev</div><div class="stat-value" id="stat-elev-gain">--<span class="stat-unit">m</span></div></div>
+              </div>
+            </div>
+            <div style="width:1px; background:var(--border-glass); margin:0 var(--space-md);"></div>
+            <div style="flex:1;">
+              <div class="panel-title"> Modified Preview</div>
+              <div class="stats-grid" id="modified-stats">
+                <div class="stat-card modified"><div class="stat-label">Dist</div><div class="stat-value" id="mod-distance">--<span class="stat-unit">km</span></div></div>
+                <div class="stat-card modified"><div class="stat-label">Total Time</div><div class="stat-value" id="mod-duration">--:--</div></div>
+                <div class="stat-card modified"><div class="stat-label">Moving Time</div><div class="stat-value" id="mod-moving-time">--:--</div></div>
+                <div class="stat-card modified"><div class="stat-label" id="lbl-mod-avg-spd">Avg Spd</div><div class="stat-value" id="mod-avg-speed">--<span class="stat-unit">km/h</span></div></div>
+                <div class="stat-card modified"><div class="stat-label" id="lbl-mod-max-spd">Max Spd</div><div class="stat-value" id="mod-max-speed">--<span class="stat-unit">km/h</span></div></div>
+                <div class="stat-card modified"><div class="stat-label">Avg HR</div><div class="stat-value" id="mod-avg-hr">--<span class="stat-unit">bpm</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-left"><div class="status-indicator"><div class="status-dot"></div><span id="status-text">Ready</span></div></div>
+    <div class="status-right">FakeStrava v2.0</div>
+  </div>
+
+  <div class="toast" id="toast"><span id="toast-icon"></span><span id="toast-message"></span></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="js/route-simplifier.js"></script>
+  <script src="js/tcx-parser.js"></script>
+    <script src="js/gpx-parser.js"></script>
+  <script src="js/vendor/fit-writer.js"></script>
+  <script src="js/tcx-generator.js?v=4"></script>
+  <script src="js/fit-generator.js"></script>
+  <script src="js/route-engine.js"></script>
+  <script src="js/realism-engine.js?v=4"></script>
+  <script src="js/heart-rate-engine.js?v=4"></script>
+  <script src="js/map-preview.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
