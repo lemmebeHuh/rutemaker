@@ -3,120 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activity Forgery Request</title>
+  <title>Activity Request</title>
   <link rel="stylesheet" href="css/client.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/geist@1.0.3/dist/fonts/geist-sans/style.css" rel="stylesheet">
 </head>
 <body>
   <div class="background-canvas">
     <div class="glow-orb orb-1"></div>
     <div class="glow-orb orb-2"></div>
-    <div class="glow-orb orb-3"></div>
   </div>
 
   <div class="app-container">
-    <header class="header">
-      <div class="logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-        <span>Activity Forge <span class="tag">Client Portal</span></span>
+    <div class="progress-container" id="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+      <div class="step-indicator" id="step-indicator">Step 1 of X</div>
+    </div>
+
+    <form id="order-form">
+      
+      <!-- STEP 1: Name -->
+      <div class="step-card active" data-step="1">
+        <h2>What's your name?</h2>
+        <p class="subtitle">So we know who we're crafting this for.</p>
+        <div class="input-group">
+          <input type="text" id="client-name" class="glass-input big-input" placeholder="Enter your name" required>
+        </div>
       </div>
-      <p class="subtitle">Submit your custom activity request</p>
-    </header>
 
-    <main class="main-content">
-      <form id="order-form" class="glass-panel">
+      <!-- STEP 2: Sport & Date -->
+      <div class="step-card" data-step="2">
+        <h2>Activity Details</h2>
+        <div class="input-group">
+          <label>Sport Type</label>
+          <select id="sport-type" class="glass-input big-input" required>
+            <option value="Running">Running</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Walking">Walking</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Date & Start Time</label>
+          <input type="datetime-local" id="start-time" class="glass-input big-input" required>
+        </div>
+      </div>
+
+      <!-- STEP 3: Targets -->
+      <div class="step-card" data-step="3">
+        <h2>Targets</h2>
+        <div class="input-group">
+          <label>Distance (km)</label>
+          <input type="number" id="target-dist" class="glass-input big-input" step="0.1" placeholder="e.g. 5.5" required>
+        </div>
+        <div class="input-group">
+          <label id="pace-label">Target Pace (e.g., 5:30) or Speed</label>
+          <input type="text" id="target-pace" class="glass-input big-input" placeholder="e.g. 5:30" required>
+          <small class="hint">*Ketik angka saja (cth: 530 otomatis jadi 5:30).<br>Biaya: < 5:30/km (+10k), < 4:30/km (+20k)</small>
+        </div>
+      
+        <div id="live-cost-container" class="invoice" style="margin-top: 15px; opacity: 0; transition: opacity 0.3s; padding: 15px;">
+          <div style="font-size: 12px; margin-bottom: 10px; color: var(--accent);">Live Estimasi Biaya</div>
+          <div class="invoice-row"><span>Base (Max 15km)</span> <span>Rp 25.000</span></div>
+          <div class="invoice-row" id="live-dist-row"><span>Jarak Tambahan</span> <span id="live-dist">Rp 0</span></div>
+          <div class="invoice-row" id="live-pace-row"><span>Pace Khusus</span> <span id="live-pace">Rp 0</span></div>
+          <hr class="invoice-divider" style="margin: 10px 0;">
+          <div class="invoice-total" style="font-size: 16px;"><span>Subtotal</span> <span id="live-subtotal" class="highlight-total" style="font-size: 18px;">Rp 25.000</span></div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Location -->
+      <div class="step-card" data-step="4">
+        <h2>Route Location</h2>
+        <p class="subtitle">Describe where you want to start and finish.</p>
+        <div class="input-group">
+          <textarea id="route-desc" class="glass-input big-input" rows="4" placeholder="e.g. Start at GBK door 5, run 2 loops counter-clockwise..." required></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 5: Realism -->
+      <div class="step-card" data-step="5">
+        <h2>Add Realism</h2>
+        <div class="input-group">
+          <label>Device Spoofing (+ Rp 4.000)</label>
+          <select id="spoof-device" class="glass-input big-input">
+            <option value="None">None (No extra charge)</option>
+            <optgroup label="Garmin">
+              <option value="Garmin Forerunner 945">Garmin Forerunner 945</option>
+              <option value="Garmin Forerunner 245">Garmin Forerunner 245</option>
+              <option value="Garmin Edge 530">Garmin Edge 530</option>
+              <option value="Garmin Fenix 7">Garmin Fenix 7</option>
+            </optgroup>
+          </select>
+        </div>
         
-        <div class="form-section">
-          <h2 class="section-title">1. Basic Details</h2>
-          <div class="input-group">
-            <label for="client-name">Your Name</label>
-            <input type="text" id="client-name" class="glass-input" placeholder="e.g. John Doe" required>
-          </div>
+        <div class="input-group checkbox-group">
+          <input type="checkbox" id="add-hr">
+          <label for="add-hr">Include Heart Rate Data (+ Rp 5.000)</label>
         </div>
 
-        <div class="form-section">
-          <h2 class="section-title">2. Activity Parameters</h2>
-          
+        <div id="hr-inputs" style="display: none; margin-top: 15px;">
           <div class="input-row">
             <div class="input-group">
-              <label for="sport-type">Sport Type</label>
-              <select id="sport-type" class="glass-input" required>
-                <option value="Running">Running</option>
-                <option value="Cycling">Cycling</option>
-                <option value="Walking">Walking</option>
-              </select>
+              <label>Avg HR (BPM)</label>
+              <input type="number" id="avg-hr" class="glass-input" value="145">
             </div>
             <div class="input-group">
-              <label for="start-time">Date & Start Time</label>
-              <input type="datetime-local" id="start-time" class="glass-input" required>
+              <label>Max HR (BPM)</label>
+              <input type="number" id="max-hr" class="glass-input" value="180">
             </div>
-          </div>
-
-          <div class="input-row">
-            <div class="input-group">
-              <label for="target-dist">Distance (km)</label>
-              <input type="number" id="target-dist" class="glass-input" step="0.1" placeholder="e.g. 5.5" required>
-            </div>
-            <div class="input-group">
-              <label for="target-pace">Target Pace/Speed</label>
-              <input type="text" id="target-pace" class="glass-input" placeholder="e.g. 6:30 /km or 25 km/h" required>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label for="route-desc">Location / Route Description</label>
-            <textarea id="route-desc" class="glass-input" rows="3" placeholder="e.g. Start at lengkong, run 2 loops counter-clockwise..." required></textarea>
           </div>
         </div>
+      </div>
 
-        <div class="form-section">
-          <h2 class="section-title">3. Realism Options</h2>
-          
-          <div class="input-group">
-            <label for="spoof-device">Spoofed Recording Device</label>
-            <select id="spoof-device" class="glass-input">
-              <optgroup label="Garmin">
-                <option value="Garmin Forerunner 945">Garmin Forerunner 945</option>
-                <option value="Garmin Forerunner 245">Garmin Forerunner 245</option>
-                <option value="Garmin Edge 530">Garmin Edge 530 (Cycling)</option>
-                <option value="Garmin Fenix 7">Garmin Fenix 7</option>
-              </optgroup>
-              <optgroup label="Apple">
-                <option value="Apple Watch Ultra">Apple Watch Ultra</option>
-              </optgroup>
-              <optgroup label="Coros">
-                <option value="COROS PACE 3">COROS PACE 3</option>
-              </optgroup>
-              <optgroup label="Huawei">
-                <option value="HUAWEI WATCH FIT 3">HUAWEI WATCH FIT 3</option>
-              </optgroup>
-              <option value="None">None (Strava App)</option>
-            </select>
-          </div>
-
-          <div class="input-row">
-            <div class="input-group">
-              <label for="avg-hr">Average HR (BPM)</label>
-              <input type="number" id="avg-hr" class="glass-input" placeholder="e.g. 145" value="145">
-            </div>
-            <div class="input-group">
-              <label for="max-hr">Max HR (BPM)</label>
-              <input type="number" id="max-hr" class="glass-input" placeholder="e.g. 180" value="180">
-            </div>
-          </div>
-          
-          <div class="input-group checkbox-group">
-            <input type="checkbox" id="add-stops" checked>
-            <label for="add-stops">Simulate natural stops (traffic lights, water breaks)</label>
-          </div>
+      <!-- STEP 6: Summary -->
+      <div class="step-card summary-card" data-step="6">
+        <h2>Review Order</h2>
+        <div class="invoice">
+          <div class="invoice-row"><span>Base Price (Max 15km)</span> <span id="sum-base">Rp 25.000</span></div>
+          <div class="invoice-row"><span>Distance Surcharge</span> <span id="sum-dist">Rp 0</span></div>
+          <div class="invoice-row"><span>Pace Surcharge</span> <span id="sum-pace">Rp 0</span></div>
+          <div class="invoice-row"><span>Device Surcharge</span> <span id="sum-device">Rp 0</span></div>
+          <div class="invoice-row"><span>Heart Rate Surcharge</span> <span id="sum-hr">Rp 0</span></div>
+          <hr class="invoice-divider">
+          <div class="invoice-total"><span>Total</span> <span id="sum-total" class="highlight-total">Rp 0</span></div>
         </div>
+      </div>
 
-        <button type="submit" class="btn-submit" id="btn-submit">
-          <span>Send Request via WhatsApp</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-        </button>
-      </form>
-    </main>
+    </form>
+
+    <div class="navigation-bar">
+      <button class="nav-btn btn-secondary" id="btn-back" style="visibility: hidden;">Back</button>
+      <button class="nav-btn btn-primary" id="btn-next">Next</button>
+    </div>
   </div>
 
   <script src="js/client.js"></script>
