@@ -337,6 +337,65 @@ const RouteEngine = (() => {
     return deg * Math.PI / 180;
   }
 
+  
+  /**
+   * Apply a perpendicular offset to the trackpoints to simulate running on the sidewalk.
+   * @param {Array} trackpoints
+   * @param {number} offsetMeters - Positive for right, negative for left
+   */
+  function applyLaneOffset(trackpoints, offsetMeters) {
+    if (trackpoints.length < 2 || offsetMeters === 0) return trackpoints;
+
+    return trackpoints.map((tp, i) => {
+      if (!tp.position) return tp;
+      
+      let p1 = trackpoints[i];
+      let p2 = trackpoints[i+1];
+      
+      if (i === trackpoints.length - 1) {
+        // Last point uses previous point's direction
+        p1 = trackpoints[i-1];
+        p2 = trackpoints[i];
+      }
+      
+      if (!p1.position || !p2.position) return tp;
+      
+      // Calculate bearing from p1 to p2
+      const lat1 = toRad(p1.position.latitudeDegrees);
+      const lon1 = toRad(p1.position.longitudeDegrees);
+      const lat2 = toRad(p2.position.latitudeDegrees);
+      const lon2 = toRad(p2.position.longitudeDegrees);
+      
+      const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+      let bearing = Math.atan2(y, x);
+      
+      // Perpendicular bearing (add 90 degrees / pi/2 radians)
+      const perpBearing = bearing + (Math.PI / 2);
+      
+      // Offset point calculation (using Haversine inverse)
+      // d / R
+      const angularDist = offsetMeters / EARTH_RADIUS_M;
+      
+      const latOrig = toRad(tp.position.latitudeDegrees);
+      const lonOrig = toRad(tp.position.longitudeDegrees);
+      
+      const latNew = Math.asin(Math.sin(latOrig) * Math.cos(angularDist) + 
+                               Math.cos(latOrig) * Math.sin(angularDist) * Math.cos(perpBearing));
+      
+      let lonNew = lonOrig + Math.atan2(Math.sin(perpBearing) * Math.sin(angularDist) * Math.cos(latOrig), 
+                                          Math.cos(angularDist) - Math.sin(latOrig) * Math.sin(latNew));
+                                          
+      return {
+        ...tp,
+        position: {
+          latitudeDegrees: latNew * 180 / Math.PI,
+          longitudeDegrees: lonNew * 180 / Math.PI
+        }
+      };
+    });
+  }
+
   // Public API
   return {
     timeShift,
@@ -349,6 +408,7 @@ const RouteEngine = (() => {
     generateTrackpointsFromRoute,
     recalculateCumulativeDistance,
     haversineDistance,
+    applyLaneOffset,
   };
 })();
 

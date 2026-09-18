@@ -291,6 +291,7 @@ const App = (() => {
     bindSlider('ctrl-trim-end', 'trim-end-value', v => `${v}%`);
     bindSlider('ctrl-loop-count', 'loop-count-value', v => `${v}�`);
     bindSlider('ctrl-elev-offset', 'elev-offset-value', v => `${v>0?'+':''}${v}m`);
+    bindSlider('ctrl-sidewalk-offset', 'sidewalk-offset-value', v => `${v>0?'+':''}${v}m`);
     bindSlider('ctrl-gps-jitter', 'gps-jitter-value', v => `${v}%`);
     bindSlider('ctrl-speed-noise', 'speed-noise-value', v => `${v}%`);
     bindSlider('ctrl-target-hr', 'target-hr-value', v => `${v} bpm`);
@@ -299,7 +300,7 @@ const App = (() => {
 
     let timer;
     ['ctrl-target-speed','ctrl-trim-start','ctrl-trim-end','ctrl-loop-count','ctrl-elev-offset','ctrl-reverse',
-     'ctrl-start-time','ctrl-gps-jitter','ctrl-speed-noise','ctrl-add-stops','ctrl-warmup','ctrl-target-hr', 'ctrl-pacing-strategy'].forEach(id => {
+     'ctrl-start-time','ctrl-sidewalk-offset','ctrl-gps-jitter','ctrl-speed-noise','ctrl-add-stops','ctrl-warmup','ctrl-target-hr', 'ctrl-pacing-strategy'].forEach(id => {
       const el = $(id);
       if (el) {
         el.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => displayModifiedPreview(), 200); });
@@ -350,6 +351,10 @@ const App = (() => {
 
     const elev = parseFloat($('ctrl-elev-offset').value);
     if (elev !== 0) tps = RouteEngine.elevationOffset(tps, elev);
+
+    
+    const laneOffset = parseFloat($('ctrl-sidewalk-offset') ? $('ctrl-sidewalk-offset').value : 0);
+    if (laneOffset !== 0) tps = RouteEngine.applyLaneOffset(tps, laneOffset);
 
     const pacingEl = $('ctrl-pacing-strategy');
     const pacingVal = pacingEl ? pacingEl.value : 'even';
