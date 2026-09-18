@@ -507,6 +507,7 @@ const App = (() => {
       $('mod-avg-hr').innerHTML = `${avgHr}<span class="stat-unit">bpm</span>`;
     }
 
+    MapPreview.displayRoute(tps, 'modified');
     $('btn-generate').disabled = false;
   }
 
