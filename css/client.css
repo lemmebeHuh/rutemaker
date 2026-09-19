@@ -170,3 +170,85 @@ select.glass-input {
   color: white;
 }
 .highlight-total { color: var(--success); font-size: 24px; }
+
+/* =============================================================
+   MOBILE RESPONSIVE ENHANCEMENTS (Client Portal - index.html / daftar.html)
+   ============================================================= */
+
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    padding: 12px 14px;
+    max-width: 100% !important;
+  }
+
+  .progress-container {
+    padding: 16px 12px 10px;
+  }
+
+  .step-indicator {
+    font-size: 11px;
+  }
+
+  /* Form Elements Touch Friendly */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"],
+  select,
+  textarea {
+    min-height: 48px;
+    font-size: 16px !important; /* Prevents auto-zoom on mobile devices */
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+
+  .nav-btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-success {
+    min-height: 48px;
+    padding: 14px 18px;
+    font-size: 15px;
+    border-radius: 10px;
+    touch-action: manipulation;
+  }
+
+  .nav-btn:active,
+  .btn-primary:active,
+  .btn-success:active {
+    transform: scale(0.97);
+  }
+
+  .button-group {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .button-group .btn-secondary,
+  .button-group .btn-primary,
+  .button-group .btn-success {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .invoice {
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .invoice-row {
+    font-size: 13px;
+  }
+
+  .invoice-total {
+    font-size: 16px;
+  }
+
+  .highlight-total {
+    font-size: 20px;
+  }
+}

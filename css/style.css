@@ -506,3 +506,194 @@ input[type="range"]::-webkit-slider-thumb {
   color: var(--text-primary);
   border: 1px solid var(--border-glass);
 }
+
+/* =============================================================
+   MOBILE & TABLET RESPONSIVE STYLES (Android / Mobile Optimized)
+   ============================================================= */
+
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    height: auto;
+  }
+
+  .app-container {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .app-header {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    height: auto;
+    min-height: 52px;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--bg-primary);
+  }
+
+  .app-logo h1 {
+    font-size: 0.95rem;
+  }
+
+  .main-grid {
+    flex-direction: column !important;
+    height: auto !important;
+    flex: none;
+  }
+
+  /* Map displayed prominently at the top on Mobile */
+  .right-panel {
+    order: 1;
+    flex: none;
+    width: 100%;
+    height: 380px !important;
+    min-height: 350px;
+    position: relative;
+    border-bottom: 1px solid var(--border-glass);
+  }
+
+  .map-panel {
+    height: 100%;
+  }
+
+  #map-container {
+    height: 100% !important;
+    min-height: 350px;
+  }
+
+  .map-toolbar {
+    top: 8px;
+    right: 8px;
+    left: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+    z-index: 1000;
+  }
+
+  .map-toolbar .btn, 
+  .map-toolbar .tool-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: 40px;
+    touch-action: manipulation;
+    border-radius: 6px;
+  }
+
+  /* Controls Sidebar below map on Mobile */
+  .left-panel {
+    order: 2;
+    flex: none;
+    width: 100% !important;
+    border-right: none;
+    border-top: 1px solid var(--border-glass);
+    padding: 16px 12px;
+    gap: 16px;
+    overflow-y: visible;
+  }
+
+  /* Touch-friendly Form Controls */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  select {
+    min-height: 44px;
+    font-size: 15px !important; /* Prevents auto-zoom on mobile webkit/android */
+    padding: 10px 12px;
+    border-radius: 6px;
+  }
+
+  .btn {
+    min-height: 44px;
+    font-size: 0.9rem;
+    padding: 10px 16px;
+    touch-action: manipulation;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 24px;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    margin-top: -8px;
+  }
+
+  /* Stats Bar on Mobile */
+  .stats-panel {
+    order: 3;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .stat-card {
+    background: var(--bg-secondary);
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-glass);
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .stat-value {
+    font-size: 0.95rem;
+  }
+
+  /* GPX Editor Responsive */
+  .editor-container {
+    padding: 12px;
+  }
+
+  .editor-card {
+    padding: 16px 12px;
+    border-radius: 10px;
+  }
+
+  .header-bar {
+    margin-bottom: 20px;
+  }
+  .header-bar h2 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .right-panel {
+    height: 320px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .control-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .control-group input[type="range"] {
+    width: 100%;
+  }
+}
