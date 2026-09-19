@@ -210,13 +210,7 @@ const App = (() => {
         state.sport = btn.dataset.sport;
 
         const pacingGroup = $('pacing-group');
-        if (pacingGroup) {
-          if (state.sport === 'Running') {
-            pacingGroup.style.display = 'block';
-          } else {
-            pacingGroup.style.display = 'none';
-          }
-        }
+        if (pacingGroup) { pacingGroup.style.display = "block"; }
 
         const defaults = { Biking: 25.0, Running: 10.0, Walking: 5.0 };
         $('ctrl-target-speed').value = defaults[state.sport];
@@ -651,6 +645,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', init);
   return { init };
 })();
+
 
 
 

@@ -697,3 +697,46 @@ input[type="range"]::-webkit-slider-thumb {
     width: 100%;
   }
 }
+
+/* =============================================================
+   MOBILE DROPDOWN & TOUCH INTERACTIVITY FIXES
+   ============================================================= */
+
+select, 
+.glass-input select,
+.editor-card select,
+#ctrl-pacing-strategy,
+#ctrl-device,
+#ctrl-format {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  font-size: 16px !important; /* Mandatory to prevent mobile browser auto-zoom & misclicks */
+  min-height: 48px !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  position: relative !important;
+  z-index: 10 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: auto !important;
+}
+
+select option {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  padding: 12px !important;
+  font-size: 15px !important;
+}
+
+.control-group {
+  position: relative;
+  z-index: 1;
+}
