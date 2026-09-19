@@ -8,11 +8,11 @@
   <style>
     :root {
       --bg-dark: #0f172a;
+      --bg-surface: #1e293b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent: #3b82f6;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --card-border: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -23,22 +23,13 @@
       line-height: 1.6;
     }
     
-    /* Background */
-    .background-canvas {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      z-index: -1;
-      background: radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15), var(--bg-dark) 70%);
-    }
-
     /* Navbar */
     header {
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -56,250 +47,269 @@
     .nav-cta {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      background: var(--text-main);
+      color: var(--bg-dark);
       padding: 10px 20px;
-      border-radius: 100px;
+      border-radius: 4px; /* Removed 100px pill, using deliberate small radius */
       font-size: 14px;
       font-weight: 600;
       text-decoration: none;
-      transition: background 0.2s;
-      opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s; }
-.nav-cta.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+      transition: background 0.2s, opacity 0.3s, transform 0.3s;
+      opacity: 0; 
+      pointer-events: none; 
+      transform: translateY(-10px); 
+    }
+    .nav-cta.visible { 
+      opacity: 1; 
+      pointer-events: auto; 
+      transform: translateY(0); 
+    }
     .nav-cta:hover {
-      background: rgba(255,255,255,0.2);
+      background: #e2e8f0;
     }
 
     /* Hero */
     .hero {
-      padding: 80px 20px;
+      padding: 120px 20px 80px; /* More rhythm, larger top space */
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
       text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
     }
     h1 {
-      font-size: clamp(32px, 6vw, 56px);
+      font-size: clamp(40px, 6vw, 64px);
       font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      letter-spacing: -1.5px;
-      background: linear-gradient(to right, #fff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      letter-spacing: -2px;
+      color: #fff; /* Solid white, no generic gradient */
     }
     p.subtitle {
-      font-size: clamp(16px, 3vw, 20px);
+      font-size: clamp(18px, 3vw, 22px);
       color: var(--text-muted);
-      max-width: 550px;
-      margin-bottom: 40px;
+      max-width: 600px;
+      margin-bottom: 48px;
     }
     
     .cta-button {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      background: var(--text-main);
+      background: var(--text-main); /* High contrast */
       color: var(--bg-dark);
-      padding: 16px 32px;
-      border-radius: 100px;
-      font-size: 16px;
+      padding: 18px 36px;
+      border-radius: 4px; /* Deliberate small radius */
+      font-size: 18px;
       font-weight: 600;
       text-decoration: none;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: background 0.2s;
     }
     .cta-button:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 30px rgba(255, 255, 255, 0.15);
+      background: #e2e8f0;
     }
 
-    /* Cards Grid */
-    .section-title {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 30px;
-      letter-spacing: -1px;
-    }
-    
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      margin: 0 auto 80px;
+    /* Feature Section */
+    .features-section {
+      max-width: 1100px;
+      margin: 0 auto 120px;
       padding: 0 20px;
     }
-
-    .info-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: left;
-      transition: transform 0.3s ease, background 0.3s ease;
+    .features-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr; /* Asymmetric layout */
+      gap: 32px;
     }
-    .info-card:hover {
-      transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.06);
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 48px;
+      border-radius: 8px; /* Slightly larger radius for big containers */
     }
-    .info-card h3 { 
-      font-size: 20px; 
-      margin-bottom: 12px; 
+    .feature-card.main-feature {
+      grid-row: span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .feature-card h3 { 
+      font-size: 24px; 
+      margin-bottom: 16px; 
       letter-spacing: -0.5px; 
-      display: flex; 
-      align-items: center; 
-      gap: 10px;
+      color: #fff;
     }
-    .info-card p { 
+    .feature-card p { 
       color: var(--text-muted); 
-      font-size: 15px; 
+      font-size: 16px; 
+      line-height: 1.7;
     }
-    
-    .step-card-ui {
-      text-align: center;
+    .icon-wrapper {
+      margin-bottom: 24px;
+      color: var(--text-main);
     }
-    .step-card-ui .icon-wrap {
-      margin-bottom: 16px;
-      color: var(--accent);
+    .main-feature h3 { font-size: 32px; margin-top: auto; }
+    .main-feature p { font-size: 18px; }
+
+    /* Process Section (Timeline) */
+    .process-section {
+      max-width: 800px;
+      margin: 0 auto 120px;
+      padding: 0 20px;
     }
-    .step-card-ui h4 {
-      font-size: 18px;
-      margin-bottom: 10px;
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 60px;
+      letter-spacing: -1px;
+    }
+    .process-list {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+    .process-step {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+    .step-number {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .step-content h4 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.7;
     }
 
     /* Footer */
     footer {
-      border-top: 1px solid var(--card-border);
-      padding: 40px 20px;
+      border-top: 1px solid var(--border-color);
+      padding: 60px 20px;
       text-align: center;
       color: var(--text-muted);
       font-size: 14px;
     }
-    .footer-links {
-      margin-top: 15px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover {
-      color: var(--text-main);
-    }
 
     /* Mobile adjustments */
-    @media (max-width: 768px) {
-      header { padding: 20px; }
-      .hero { padding: 60px 20px; }
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card.main-feature { grid-row: auto; }
+      .process-step { flex-direction: column; gap: 16px; }
     }
   </style>
 </head>
 <body>
-  <div class="background-canvas"></div>
   
-  <!-- Header -->
   <header>
     <a href="index.html" class="logo">ruteu.</a>
     <a href="daftar.html" class="nav-cta" id="header-cta">Pesan Sekarang</a>
   </header>
 
   <main>
-    <!-- Hero -->
     <section class="hero">
       <h1>Biar Kami yang Keringetan,<br>Kamu Tinggal Terima Beres.</h1>
       <p class="subtitle">Layanan ruteu paling sat-set. Tentukan mau lari atau gowes di mana, jarak, & pace-nya. Joki lapangan kami yang beresin semuanya.</p>
-      <a href="daftar.html" class="cta-button">
+      <a href="daftar.html" class="cta-button" id="hero-cta">
         Buat Orderan
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       </a>
     </section>
 
-    <!-- Point Utama -->
-    <section class="grid-container">
-      <div class="info-card">
-        <h3>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-          Rute Suka-Suka
-        </h3>
-        <p>Bebas mau mulai dari mana, finish di mana. Tinggal share lokasinya, pelari kita yang bakal kerjain di sana.</p>
-      </div>
-      <div class="info-card">
-        <h3>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-          Pace Bebas Atur
-        </h3>
-        <p>Mau pace santai buat recovery atau pace kenceng ngebut? Bisa banget. Kasih tau aja target waktunya, kita yang kejar.</p>
-      </div>
-      <div class="info-card">
-        <h3>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.5 7.5L18 3h-12l1.5 4.5"></path><path d="M7.5 16.5L6 21h12l-1.5-4.5"></path></svg>
-          Rekaman Jam Asli
-        </h3>
-        <p>Aktivitas kamu direkam pakai smartwatch beneran (seperti Garmin). Jadi data GPS & detak jantung kelihatan mulus dan natural.</p>
+    <section class="features-section">
+      <div class="features-grid">
+        <div class="feature-card main-feature">
+          <div class="icon-wrapper">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </div>
+          <div>
+            <h3>Rute Suka-Suka</h3>
+            <p>Bebas mau mulai dari mana, finish di mana. Tinggal share lokasinya, pelari kita yang bakal kerjain di sana. Kami melayani semua jenis medan, dari jalan raya hingga stadion, untuk mendapatkan rute paling realistis.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>Pace Bebas Atur</h3>
+          <p>Mau pace santai buat recovery atau pace kenceng ngebut? Bisa banget. Kasih tau aja target waktunya, kita yang kejar.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+          </div>
+          <h3>Rekaman Jam Asli</h3>
+          <p>Aktivitas kamu direkam pakai smartwatch beneran. Jadi data GPS & detak jantung kelihatan mulus dan natural.</p>
+        </div>
       </div>
     </section>
   
-    <!-- Cara Pesan -->
-    <h2 class="section-title">Cara Pesan</h2>
-    <section class="grid-container">
-      <div class="info-card step-card-ui">
-        <div class="icon-wrap">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+    <section class="process-section">
+      <h2 class="section-title">Cara Pesan</h2>
+      <div class="process-list">
+        <div class="process-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Chat & Bayar</h4>
+            <p>Isi form order buat ngasih tau kita detail lari/gowes yang dimau, lalu lunasi tagihan via WhatsApp. Komunikasi langsung tanpa basa-basi.</p>
+          </div>
         </div>
-        <h4>1. Chat & Bayar</h4>
-        <p>Isi form order buat ngasih tau kita detail lari/gowes yang dimau, terus lunasi tagihan via WhatsApp.</p>
-      </div>
-      
-      <div class="info-card step-card-ui">
-        <div class="icon-wrap">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+        
+        <div class="process-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Izin Login</h4>
+            <p>Kita butuh login sebentar ke akun Strava kamu. Cukup teruskan kode OTP dari email ke kami, dan kami jamin kerahasiaan akunmu.</p>
+          </div>
         </div>
-        <h4>2. Izin Login</h4>
-        <p>Kita butuh login sebentar ke akun Strava kamu. Nanti kamu tinggal kasih kode OTP dari email.</p>
-      </div>
-      
-      <div class="info-card step-card-ui">
-        <div class="icon-wrap">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4h.01"></path><path d="M4 17l5-4-2-4 3.5-3.5 2 2 3.5-1.5"></path><path d="M17 19l-3-4 1-5"></path></svg>
+        
+        <div class="process-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Dieksekusi</h4>
+            <p>Pelari lapangan kita bakal langsung turun ke jalan buat mengeksekusi rute sesuai dengan pace dan jarak pesanan.</p>
+          </div>
         </div>
-        <h4>3. Dieksekusi</h4>
-        <p>Pelari lapangan kita bakal langsung turun ke jalan buat ngeksekusi rute sesuai pesanan.</p>
-      </div>
-      
-      <div class="info-card step-card-ui">
-        <div class="icon-wrap">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        
+        <div class="process-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Beres Deh!</h4>
+            <p>Aktivitas langsung muncul di feed Strava kamu. Siap-siap kebanjiran Kudos dari followers kamu!</p>
+          </div>
         </div>
-        <h4>4. Beres Deh!</h4>
-        <p>Aktivitas langsung muncul di feed kamu. Siap-siap kebanjiran Kudos dari followers kamu!</p>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  
   <footer>
     <p>&copy; 2026 ruteu. All rights reserved.</p>
   </footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const heroCta = document.querySelector(".hero .cta-button");
+      const heroCta = document.getElementById("hero-cta");
       const headerCta = document.getElementById("header-cta");
       
       if (heroCta && headerCta) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (!entry.isIntersecting) {
-              // Hero button is out of view, show header button
               headerCta.classList.add("visible");
             } else {
-              // Hero button is in view, hide header button
               headerCta.classList.remove("visible");
             }
           });

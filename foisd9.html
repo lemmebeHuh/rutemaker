@@ -11,22 +11,24 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FakeStrava � Realistic Activity Generator</title>
+  <title>ruteu. Admin - Route Engine</title>
   <meta name="description" content="Generate realistic TCX activity files for Strava. Upload existing routes or draw new ones with road-snapping.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>T</text></svg>">
+  <link rel="stylesheet" href="css/style.css?v=7">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>R</text></svg>">
 </head>
 <body>
   <div class="app-container">
     <header class="app-header">
       <div class="app-logo">
-        <span class="logo-icon">Forge</span>
-        <div><h1>FakeStrava</h1></div>
+        <span class="logo-icon">ruteu.</span>
+        <div><h1>Admin Panel</h1></div>
         <span class="version">v2.0</span>
       </div>
       <div class="mode-tabs">
+        <button id="theme-toggle" class="btn btn-outline btn-sm" style="margin-right:8px;">?? Dark Mode</button>
+        <button id="btn-settings" class="btn btn-outline btn-sm" style="margin-right:8px;">⚙️ Settings</button>
         <button class="mode-tab active" data-mode="upload" id="tab-upload">Upload TCX</button>
         <button class="mode-tab" data-mode="draw" id="tab-draw">Draw Route</button>
       </div>
@@ -36,7 +38,7 @@
       <!-- Left Panel: Controls & Upload -->
       <div class="left-panel">
         
-        <div class="upload-panel glass-panel animate-in" id="upload-panel">
+        <div class="upload-panel glass-panel" id="upload-panel">
           <div class="panel-title"> Activity Source</div>
           <div class="sport-selector" id="sport-selector">
             <button class="sport-btn active" data-sport="Biking">Cycling</button>
@@ -83,6 +85,14 @@
           </div>
           <input type="file" id="file-input" accept=".tcx,.gpx">
 
+          <div class="strava-import-section" style="margin-top: 15px; border-top: 1px solid var(--border-glass); padding-top: 15px;">
+            <div class="control-label" style="margin-bottom: 5px;">Import Route from Strava</div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="strava-route-url" class="glass-input" placeholder="Strava Route ID or URL" style="flex: 1;">
+              <button id="btn-import-route" class="btn btn-primary btn-sm">Import</button>
+            </div>
+          </div>
+
           <div class="draw-mode-banner" id="draw-mode-banner">
             Click map to add waypoints. Right-click marker to remove.
           </div>
@@ -97,7 +107,7 @@
           </div>
         </div>
 
-        <div class="controls-panel glass-panel animate-in" id="controls-panel" style="animation-delay: 0.1s; margin-top: var(--space-md);">
+        <div class="controls-panel glass-panel" id="controls-panel" style="margin-top: var(--space-md);">
           <div class="panel-title"> Modifications</div>
           
           <div class="accordion">
@@ -178,7 +188,7 @@
                   <label class="toggle-switch">
                     <input type="checkbox" id="ctrl-add-stops" checked>
                     <span class="toggle-slider"></span>
-                    <span class="toggle-label">Natural Stops <small style="display:block; font-size:0.7em; color:var(--text-tertiary); font-weight:normal; margin-top:2px; line-height:1.2;">(Menambahkan jeda diam acak 10-40 detik seperti berhenti di lampu merah)</small></span>
+                    <span class="toggle-label">Natural Stops <small style="display:block; font-size:0.7em; color:var(--text-tertiary); font-weight:normal; margin-top:2px; line-height:1.2;">(Jeda diam acak 10-40s)</small></span>
                   </label>
                 </div>
                 <div class="control-group">
@@ -202,6 +212,21 @@
                     <span class="toggle-label">Generate Heart Rate</span>
                   </label>
                 </div>
+
+                <div class="strava-import-section" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-glass); padding-bottom: 15px;">
+                  <div class="control-label" style="margin-bottom: 5px;">Clone Real Biometrics</div>
+                  <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="text" id="strava-activity-url" class="glass-input" placeholder="Strava Activity URL/ID" style="flex: 1;">
+                    <button id="btn-clone-biometrics" class="btn btn-outline btn-sm" title="Requires Strava API Token">API Clone</button>
+                  </div>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 0.8em; color: var(--text-tertiary); text-align: center;">-- ATAU UPLOAD FILE (GRATIS) --</span>
+                    <input type="file" id="clone-file-input" accept=".tcx,.gpx" class="glass-input" style="width: 100%; padding: 4px; font-size: 0.8em;">
+                  </div>
+                  <small id="clone-status" style="display:block; margin-top:5px; color: var(--text-tertiary);"></small>
+                </div>
+
                 <div id="hr-controls">
                   <div class="control-group">
                     <div class="control-label"><span>Target Avg HR</span><span class="control-value" id="target-hr-value">145 bpm</span></div>
@@ -236,7 +261,7 @@
 
       <!-- Right Panel: Map & Stats -->
       <div class="right-panel">
-        <div class="map-panel glass-panel animate-in" id="map-panel" style="animation-delay: 0.2s">
+        <div class="map-panel glass-panel" id="map-panel">
           <div class="map-toolbar-wrapper">
             <div id="map-container"></div>
             <!-- Map Overlay Controls -->
@@ -249,7 +274,7 @@
           </div>
         </div>
 
-        <div class="stats-panel glass-panel animate-in" style="animation-delay: 0.3s; margin-top: var(--space-md);">
+        <div class="stats-panel glass-panel" style="margin-top: var(--space-md);">
           <div style="display:flex; justify-content:space-between;">
             <div style="flex:1;">
               <div class="panel-title"> Original Stats</div>
@@ -279,19 +304,37 @@
       </div>
     </div>
   </div>
-
-  <div class="status-bar">
-    <div class="status-left"><div class="status-indicator"><div class="status-dot"></div><span id="status-text">Ready</span></div></div>
-    <div class="status-right">FakeStrava v2.0</div>
+    <!-- End of main grid -->
+    <div class="status-bar">
+      <div class="status-left"><div class="status-indicator"><div class="status-dot"></div><span id="status-text">Ready</span></div></div>
+      <div class="status-right">ruteu. Admin v2.0</div>
+    </div>
   </div>
+  <!-- End of app-container -->
 
   <div class="toast" id="toast"><span id="toast-icon"></span><span id="toast-message"></span></div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div class="modal-content glass-panel" style="width: 400px; padding: 20px;">
+      <h3 style="margin-top:0;">Settings</h3>
+      <div class="control-group" style="flex-direction: column; align-items: flex-start;">
+        <div class="control-label" style="margin-bottom: 5px;">Strava Access Token (read_all)</div>
+        <input type="password" id="strava-access-token" class="glass-input" style="width: 100%;">
+        <small style="margin-top: 5px; color: var(--text-tertiary);">Get this from developers.strava.com. Stored locally.</small>
+      </div>
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button id="btn-settings-cancel" class="btn btn-outline">Cancel</button>
+        <button id="btn-settings-save" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   <script src="js/route-simplifier.js"></script>
   <script src="js/tcx-parser.js"></script>
-    <script src="js/gpx-parser.js"></script>
+  <script src="js/gpx-parser.js"></script>
   <script src="js/vendor/fit-writer.js"></script>
   <script src="js/tcx-generator.js?v=4"></script>
   <script src="js/fit-generator.js"></script>
@@ -299,14 +342,8 @@
   <script src="js/realism-engine.js?v=4"></script>
   <script src="js/heart-rate-engine.js?v=4"></script>
   <script src="js/map-preview.js?v=4"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/strava-api.js"></script>
+  <script src="js/clone-engine.js"></script>
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-

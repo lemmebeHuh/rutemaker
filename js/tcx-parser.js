@@ -24,7 +24,7 @@ const TCXParser = (() => {
     }
 
     const activities = [];
-    const activityElements = xmlDoc.querySelectorAll('Activity');
+    const activityElements = xmlDoc.getElementsByTagName('Activity');
 
     for (const actEl of activityElements) {
       activities.push(parseActivity(actEl));
@@ -47,7 +47,7 @@ const TCXParser = (() => {
     const id = getTextContent(actEl, ':scope > Id');
 
     const laps = [];
-    const lapElements = actEl.querySelectorAll('Lap');
+    const lapElements = actEl.getElementsByTagName('Lap');
 
     for (const lapEl of lapElements) {
       laps.push(parseLap(lapEl));
@@ -79,7 +79,7 @@ const TCXParser = (() => {
       tracks: [],
     };
 
-    const trackElements = lapEl.querySelectorAll('Track');
+    const trackElements = lapEl.getElementsByTagName('Track');
     for (const trackEl of trackElements) {
       lap.tracks.push(parseTrack(trackEl));
     }
@@ -92,7 +92,7 @@ const TCXParser = (() => {
    */
   function parseTrack(trackEl) {
     const trackpoints = [];
-    const tpElements = trackEl.querySelectorAll('Trackpoint');
+    const tpElements = trackEl.getElementsByTagName('Trackpoint');
 
     for (const tpEl of tpElements) {
       trackpoints.push(parseTrackpoint(tpEl));
@@ -105,8 +105,12 @@ const TCXParser = (() => {
    * Parse a single Trackpoint element.
    */
   function parseTrackpoint(tpEl) {
+    let timeText = '';
+    const timeEls = tpEl.getElementsByTagName('Time');
+    if (timeEls.length > 0) timeText = timeEls[0].textContent.trim();
+
     const tp = {
-      time: getTextContent(tpEl, 'Time') || '',
+      time: timeText || '',
       position: null,
       altitudeMeters: null,
       distanceMeters: null,
@@ -115,63 +119,65 @@ const TCXParser = (() => {
       speed: null,
     };
 
-    // Position
-    const posEl = tpEl.querySelector('Position');
-    if (posEl) {
-      tp.position = {
-        latitudeDegrees: parseFloat(getTextContent(posEl, 'LatitudeDegrees')) || 0,
-        longitudeDegrees: parseFloat(getTextContent(posEl, 'LongitudeDegrees')) || 0,
-      };
-    }
-
-    // Altitude
-    const altText = getTextContent(tpEl, 'AltitudeMeters');
-    if (altText !== null) {
-      tp.altitudeMeters = parseFloat(altText);
-    }
-
-    // Cumulative Distance
-    const distText = getTextContent(tpEl, 'DistanceMeters');
-    if (distText !== null) {
-      tp.distanceMeters = parseFloat(distText);
-    }
-
-    // Heart Rate
-    const hrEl = tpEl.querySelector('HeartRateBpm');
-    if (hrEl) {
-      tp.heartRateBpm = parseInt(getTextContent(hrEl, 'Value')) || null;
-    }
-
-    // Cadence (direct child, not in extensions)
-    const cadText = getTextContent(tpEl, ':scope > Cadence');
-    if (cadText !== null) {
-      tp.cadence = parseInt(cadText);
-    }
-
-    // Extensions (TPX - speed, HR, cadence)
-    const tpxEl = tpEl.querySelector('Extensions');
-    if (tpxEl) {
-      const speedText = tpxEl.querySelector('Speed');
-      if (speedText) {
-        tp.speed = parseFloat(speedText.textContent) || 0;
-      }
-
-      // Some TCX files put HR in extensions
-      if (!tp.heartRateBpm) {
-        const hrExtEl = tpxEl.querySelector('HeartRateBpm');
-        if (hrExtEl) {
-          const hrVal = hrExtEl.querySelector('Value');
-          tp.heartRateBpm = hrVal ? parseInt(hrVal.textContent) : null;
+    const posEls = tpEl.getElementsByTagName('Position');
+    if (posEls.length > 0) {
+      const posEl = posEls[0];
+      const latEls = posEl.getElementsByTagName('LatitudeDegrees');
+      const lonEls = posEl.getElementsByTagName('LongitudeDegrees');
+      if (latEls.length > 0 && lonEls.length > 0) {
+        const lat = parseFloat(latEls[0].textContent);
+        const lon = parseFloat(lonEls[0].textContent);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          tp.position = { latitudeDegrees: lat, longitudeDegrees: lon };
         }
+      }
+    }
+
+    const altEls = tpEl.getElementsByTagName('AltitudeMeters');
+    if (altEls.length > 0) {
+      tp.altitudeMeters = parseFloat(altEls[0].textContent);
+    }
+
+    const distEls = tpEl.getElementsByTagName('DistanceMeters');
+    if (distEls.length > 0) {
+      tp.distanceMeters = parseFloat(distEls[0].textContent);
+    }
+
+    const hrEls = tpEl.getElementsByTagName('HeartRateBpm');
+    if (hrEls.length > 0) {
+      const hrValEls = hrEls[0].getElementsByTagName('Value');
+      if (hrValEls.length > 0) {
+        tp.heartRateBpm = parseInt(hrValEls[0].textContent);
+      }
+    }
+
+    const cadEls = tpEl.getElementsByTagName('Cadence');
+    if (cadEls.length > 0) {
+      tp.cadence = parseInt(cadEls[0].textContent);
+    } else {
+        const runCadEls = tpEl.getElementsByTagName('RunCadence');
+        if (runCadEls.length > 0) {
+            tp.cadence = parseInt(runCadEls[0].textContent);
+        }
+    }
+
+    const extEls = tpEl.getElementsByTagName('Extensions');
+    if (extEls.length > 0) {
+      const tpxEl = extEls[0];
+      const speedEls = tpxEl.getElementsByTagName('Speed');
+      if (speedEls.length > 0) {
+        tp.speed = parseFloat(speedEls[0].textContent);
+      }
+      
+      const wattsEls = tpxEl.getElementsByTagName('Watts');
+      if (wattsEls.length > 0) {
+        tp.watts = parseInt(wattsEls[0].textContent);
       }
     }
 
     return tp;
   }
 
-  /**
-   * Compute summary stats from all laps.
-   */
   function computeActivitySummary(laps) {
     let totalTimeSeconds = 0;
     let totalDistanceMeters = 0;

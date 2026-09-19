@@ -20,7 +20,7 @@ const GPXParser = (() => {
     }
 
     // GPX tracks
-    const trkElements = xmlDoc.querySelectorAll('trk');
+    const trkElements = xmlDoc.getElementsByTagName('trk');
     const activities = [];
 
     for (const trkEl of trkElements) {
@@ -29,7 +29,7 @@ const GPXParser = (() => {
 
     // If no <trk>, try <rte> (route) elements
     if (activities.length === 0) {
-      const rteElements = xmlDoc.querySelectorAll('rte');
+      const rteElements = xmlDoc.getElementsByTagName('rte');
       for (const rteEl of rteElements) {
         activities.push(parseRoute(rteEl));
       }
@@ -55,7 +55,7 @@ const GPXParser = (() => {
     const sport = detectSport(type, name);
 
     const laps = [];
-    const trkSegElements = trkEl.querySelectorAll('trkseg');
+    const trkSegElements = trkEl.getElementsByTagName('trkseg');
 
     for (const segEl of trkSegElements) {
       laps.push(parseSegment(segEl, 'trkpt'));
@@ -93,7 +93,7 @@ const GPXParser = (() => {
    */
   function parseSegment(segEl, pointTag) {
     const trackpoints = [];
-    const ptElements = segEl.querySelectorAll(pointTag);
+    const ptElements = segEl.getElementsByTagName(pointTag);
     let cumulativeDistance = 0;
 
     for (let i = 0; i < ptElements.length; i++) {
@@ -145,8 +145,12 @@ const GPXParser = (() => {
     const lat = parseFloat(ptEl.getAttribute('lat')) || 0;
     const lon = parseFloat(ptEl.getAttribute('lon')) || 0;
 
+    let time = '';
+    const timeEls = ptEl.getElementsByTagName('time');
+    if (timeEls.length > 0) time = timeEls[0].textContent.trim();
+
     const tp = {
-      time: getTextContent(ptEl, 'time') || '',
+      time: time,
       position: { latitudeDegrees: lat, longitudeDegrees: lon },
       altitudeMeters: null,
       distanceMeters: null,
@@ -155,38 +159,32 @@ const GPXParser = (() => {
       speed: null,
     };
 
-    // Elevation
-    const eleText = getTextContent(ptEl, 'ele');
-    if (eleText !== null) {
-      tp.altitudeMeters = parseFloat(eleText);
+    const eleEls = ptEl.getElementsByTagName('ele');
+    if (eleEls.length > 0) {
+      tp.altitudeMeters = parseFloat(eleEls[0].textContent);
     }
 
-    // Heart rate from extensions (Garmin, Strava, etc.)
-    const hrEl = ptEl.querySelector('extensions');
-    if (hrEl) {
-      // Try common HR extension formats
-      const hrValue = hrEl.querySelector('hr') ||
-                      hrEl.querySelector('TrackPointExtension > hr') ||
-                      hrEl.querySelector('gpxtpx\\:hr, hr');
-      if (hrValue) {
-        tp.heartRateBpm = parseInt(hrValue.textContent) || null;
+    const extEls = ptEl.getElementsByTagName('extensions');
+    if (extEls.length > 0) {
+      const extEl = extEls[0];
+      const hrEls = extEl.getElementsByTagName('hr');
+      if (hrEls.length > 0) tp.heartRateBpm = parseInt(hrEls[0].textContent) || null;
+      else {
+        const hrEls2 = extEl.getElementsByTagName('gpxtpx:hr');
+        if (hrEls2.length > 0) tp.heartRateBpm = parseInt(hrEls2[0].textContent) || null;
       }
 
-      // Try cadence
-      const cadValue = hrEl.querySelector('cad') ||
-                        hrEl.querySelector('TrackPointExtension > cad') ||
-                        hrEl.querySelector('gpxtpx\\:cad, cad');
-      if (cadValue) {
-        tp.cadence = parseInt(cadValue.textContent) || null;
+      const cadEls = extEl.getElementsByTagName('cad');
+      if (cadEls.length > 0) tp.cadence = parseInt(cadEls[0].textContent) || null;
+      else {
+        const cadEls2 = extEl.getElementsByTagName('gpxtpx:cad');
+        if (cadEls2.length > 0) tp.cadence = parseInt(cadEls2[0].textContent) || null;
       }
     }
 
     return tp;
   }
 
-  /**
-   * Detect sport type from GPX type/name fields.
-   */
   function detectSport(type, name) {
     const combined = (type + ' ' + name).toLowerCase();
     if (combined.includes('run') || combined.includes('lari')) return 'Running';

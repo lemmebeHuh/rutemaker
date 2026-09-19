@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FakeStrava - Main App Controller v2
  */
 
@@ -12,6 +12,8 @@ const App = (() => {
     originalTrackpoints: [],
     routeData: null,
     isDrawMode: false,
+    clonedStream: null,
+    clonedStreamId: null,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -36,6 +38,20 @@ const App = (() => {
   }
 
   function init() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (themeToggle) {
+      themeToggle.textContent = currentTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeToggle.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      });
+    }
+
     MapPreview.init('map-container', onRouteCalculated);
     bindModeTabEvents();
     bindSportSelectorEvents();
@@ -65,6 +81,80 @@ const App = (() => {
     $('btn-redo').addEventListener('click', () => MapPreview.redo());
 
     updateStatus('Ready - Upload a TCX file or draw a route');
+
+    // Strava API Bindings
+    const btnSettings = $('btn-settings');
+    const settingsModal = $('settings-modal');
+    if (btnSettings && settingsModal) {
+      btnSettings.addEventListener('click', () => settingsModal.style.display = 'flex');
+      $('btn-settings-cancel').addEventListener('click', () => settingsModal.style.display = 'none');
+      $('btn-settings-save').addEventListener('click', () => {
+        const token = $('strava-access-token').value.trim();
+        if (token) localStorage.setItem('strava_token', token);
+        settingsModal.style.display = 'none';
+        showToast('Settings saved', 'success');
+      });
+      const savedToken = localStorage.getItem('strava_token');
+      if (savedToken) $('strava-access-token').value = savedToken;
+    }
+
+    const btnImport = $('btn-import-route');
+    if (btnImport) {
+      btnImport.addEventListener('click', async () => {
+        const urlOrId = $('strava-route-url').value.trim();
+        const token = localStorage.getItem('strava_token');
+        if (!urlOrId) return showToast('Please enter Route ID or URL', 'error');
+        if (!token) return showToast('Please set Strava Access Token in Settings', 'error');
+        
+        const origText = btnImport.textContent;
+        btnImport.textContent = 'Importing...';
+        btnImport.disabled = true;
+        try {
+          const gpxText = await StravaAPI.getRouteGPX(urlOrId, token);
+          const blob = new Blob([gpxText], { type: 'text/xml' });
+          const file = new File([blob], `route_${urlOrId}.gpx`, { type: 'text/xml' });
+          handleFile(file);
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          btnImport.textContent = origText;
+          btnImport.disabled = false;
+        }
+      });
+    }
+
+    const btnClone = $('btn-clone-biometrics');
+    if (btnClone) {
+      btnClone.addEventListener('click', async () => {
+        const urlOrId = $('strava-activity-url').value.trim();
+        const token = localStorage.getItem('strava_token');
+        if (!urlOrId) return showToast('Please enter Activity ID or URL', 'error');
+        if (!token) return showToast('Please set Strava Access Token in Settings', 'error');
+        
+        const origText = btnClone.textContent;
+        btnClone.textContent = 'Cloning...';
+        btnClone.disabled = true;
+        $('clone-status').textContent = 'Fetching streams...';
+        $('clone-status').style.color = 'var(--text-tertiary)';
+        try {
+          const streamData = await StravaAPI.getActivityStreams(urlOrId, token);
+          state.clonedStream = streamData;
+          state.clonedStreamId = urlOrId;
+          $('clone-status').textContent = `Success! Cloned from Activity ${urlOrId}. Will be applied on Generation.`;
+          $('clone-status').style.color = '#4ade80';
+          showToast('Biometrics cloned!', 'success');
+        } catch (err) {
+          $('clone-status').textContent = err.message;
+          $('clone-status').style.color = '#ef4444';
+          showToast(err.message, 'error');
+          state.clonedStream = null;
+        } finally {
+          btnClone.textContent = origText;
+          btnClone.disabled = false;
+        }
+      });
+    }
+
   }
 
   function bindAccordion() {
@@ -183,14 +273,41 @@ const App = (() => {
         displayOriginalStats();
         
         const summary = state.parsedData.activities[0].summary;
-        const avgSpd = (summary.avgSpeed * 3.6).toFixed(1);
+        let calculatedSpeed = summary.avgSpeed * 3.6;
+        if (calculatedSpeed <= 0) {
+            const fileSport = state.parsedData.activities[0].sport;
+            if (fileSport === 'Running') calculatedSpeed = 10;
+            else if (fileSport === 'Walking') calculatedSpeed = 5;
+            else calculatedSpeed = 25; // Default Biking
+        }
+        
+        const avgSpd = calculatedSpeed.toFixed(1);
         $('ctrl-target-speed').value = avgSpd;
         
         const f = formatSpeedUI(parseFloat(avgSpd));
         updateControlValue('target-speed-value', `${f.val} ${f.unit}`);
 
-        displayModifiedPreview();
-        MapPreview.displayRoute(state.originalTrackpoints, 'original');
+                  displayModifiedPreview();
+          MapPreview.displayRoute(state.originalTrackpoints, 'original');
+
+          if (state.originalTrackpoints && state.originalTrackpoints.length > 0) {
+            const rawWps = state.originalTrackpoints
+              .filter(tp => tp.position && !isNaN(tp.position.latitudeDegrees) && !isNaN(tp.position.longitudeDegrees))
+              .map(tp => ({ lat: tp.position.latitudeDegrees, lng: tp.position.longitudeDegrees }));
+
+            if (rawWps.length > 0) {
+              let simplified = rawWps;
+              if (rawWps.length > 30 && typeof RouteSimplifier !== 'undefined') {
+                let epsilon = 0.0001;
+                for (let i = 0; i < 20; i++) {
+                  simplified = RouteSimplifier.ramerDouglasPeucker(rawWps, epsilon);
+                  if (simplified.length <= 40) break;
+                  epsilon += 0.0002;
+                }
+              }
+              MapPreview.loadWaypoints(simplified);
+            }
+          }
 
         const uploadZone = $('upload-zone');
         uploadZone.classList.add('has-file');
@@ -243,6 +360,7 @@ const App = (() => {
       updateStatus('Generating TCX...');
       try {
         const tps = getModifiedTrackpoints();
+        
         let finalData;
         let sourceData = state.parsedData;
 
@@ -289,7 +407,7 @@ const App = (() => {
     bindSlider('ctrl-target-speed', 'target-speed-value', v => { const f = formatSpeedUI(parseFloat(v)); return `${f.val} ${f.unit}`; });
     bindSlider('ctrl-trim-start', 'trim-start-value', v => `${v}%`);
     bindSlider('ctrl-trim-end', 'trim-end-value', v => `${v}%`);
-    bindSlider('ctrl-loop-count', 'loop-count-value', v => `${v}�`);
+    bindSlider('ctrl-loop-count', 'loop-count-value', v => `${v}ï¿½`);
     bindSlider('ctrl-elev-offset', 'elev-offset-value', v => `${v>0?'+':''}${v}m`);
     bindSlider('ctrl-sidewalk-offset', 'sidewalk-offset-value', v => `${v>0?'+':''}${v}m`);
     bindSlider('ctrl-gps-jitter', 'gps-jitter-value', v => `${v}%`);
@@ -483,6 +601,7 @@ const App = (() => {
 
   function displayModifiedPreview() {
     const tps = getModifiedTrackpoints();
+        
     if (tps.length === 0) return;
 
     const stats = calcStats(tps);
@@ -532,6 +651,8 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', init);
   return { init };
 })();
+
+
 
 
 

@@ -164,7 +164,26 @@ const RouteEngine = (() => {
     const startTime = new Date(trackpoints[0].time).getTime();
     const currentTotalTime = (new Date(trackpoints[trackpoints.length - 1].time).getTime() - startTime) / 1000;
     
-    if (currentTotalTime <= 0) return trackpoints;
+    if (isNaN(currentTotalTime) || currentTotalTime <= 0) {
+        let accumulatedTimeMs = 0;
+        let validStartTime = isNaN(startTime) ? Date.now() : startTime;
+        
+        return trackpoints.map((tp, i) => {
+            if (i > 0 && trackpoints[i-1].position && tp.position) {
+                const dist = haversineDistance(
+                    trackpoints[i-1].position.latitudeDegrees, trackpoints[i-1].position.longitudeDegrees,
+                    tp.position.latitudeDegrees, tp.position.longitudeDegrees
+                );
+                accumulatedTimeMs += (dist / targetSpeedMs) * 1000;
+            }
+            const newTime = new Date(validStartTime + accumulatedTimeMs);
+            return {
+                ...tp,
+                time: newTime.toISOString().replace('.000Z', 'Z'),
+                speed: Math.round(targetSpeedMs * 10) / 10
+            };
+        });
+    }
     
     const factor = currentTotalTime / targetTotalTime;
     

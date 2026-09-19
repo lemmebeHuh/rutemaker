@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <script>
+    const pwd = prompt("Enter Admin Password:");
+    if (pwd !== "kalamales") {
+      document.write("Access Denied.");
+      window.location.href = "index.html";
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ruteu. Admin - GPX Editor</title>
+  <meta name="description" content="GPX File Editor to fill missing values and modify timestamps.">
+  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>R</text></svg>">
+  <style>
+    .editor-container { max-width: 800px; margin: 0 auto; padding: 20px; color: var(--text); }
+    .editor-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
+    .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Space Grotesk', sans-serif; transition: all 0.2s; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .btn-large { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Space Grotesk', sans-serif; }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59,130,246,0.4); }
+    .upload-zone-editor { border: 2px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 20px; }
+    .upload-zone-editor:hover { border-color: var(--primary); background: rgba(59,130,246,0.05); }
+    .hidden { display: none !important; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .back-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 500; }
+    .back-btn:hover { background: var(--border); }
+    .status-text { margin-top: 10px; font-size: 0.85rem; color: var(--success); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="editor-container">
+      <div class="header-bar">
+        <h2>🛠️ GPX File Editor</h2>
+        <a href="foisd9.html" class="back-btn">← Back to Forge</a>
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div class="editor-card" id="step1-upload">
+        <p style="margin-bottom: 20px; color: var(--text-muted); line-height: 1.5;">
+          Upload file mentah .gpx kamu di sini untuk memodifikasi metadata dan menambal tag &lt;time&gt; yang kosong sebelum diproses lebih lanjut.
+        </p>
+        
+        <input type="file" id="gpx-file-input" accept=".gpx" class="hidden">
+        <div class="upload-zone-editor" onclick="document.getElementById('gpx-file-input').click()">
+          <div style="font-size: 2.5rem; margin-bottom: 15px;">📂</div>
+          <h3 style="margin-bottom: 5px;">Pilih File GPX</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Klik untuk mencari file di perangkamu</p>
+          <div id="upload-status" class="status-text hidden">File loaded successfully!</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Editor Form -->
+      <div class="editor-card hidden" id="step2-editor" style="margin-top: 20px;">
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Metadata & Data Fixes</h3>
+        
+        <div class="form-group">
+          <label>Activity Name</label>
+          <input type="text" id="edit-name" placeholder="Morning Ride">
+        </div>
+        
+        <div class="form-group">
+          <label>Activity Type</label>
+          <select id="edit-type">
+            <option value="Biking">Biking (Cycling)</option>
+            <option value="Running">Running</option>
+            <option value="Walking">Walking / Hiking</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Base Start Time (Local Time)</label>
+          <input type="datetime-local" id="edit-start-time">
+          <small style="color: var(--text-muted); display: block; margin-top: 5px;">Akan digunakan sebagai patokan awal trackpoints.</small>
+        </div>
+
+        <div class="form-group" style="background: rgba(59,130,246,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">
+          <label style="color: var(--primary);">Simulate Missing Timestamps (Target Speed km/h)</label>
+          <input type="number" id="edit-target-speed" step="0.1" value="25" placeholder="Contoh: 25">
+          <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+            Jika file aslimu tidak memiliki rekaman waktu di tiap koordinatnya, fitur ini akan secara otomatis menyuntikkan tag waktu (time) buatan berdasarkan jarak dan kecepatan ini.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Elevation Offset (Meters)</label>
+          <input type="number" id="edit-elev-offset" value="0">
+          <small style="color: var(--text-muted); display: block; margin-top: 5px;">Tambahkan atau kurangi elevasi secara massal.</small>
+        </div>
+
+        <button class="btn-large btn-primary" id="btn-export-gpx" style="margin-top: 30px;">
+          💾 Save & Download GPX
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/route-engine.js?v=4"></script>
+  <script src="js/gpx-editor.js?v=1"></script>
+</body>
+</html>
