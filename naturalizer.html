@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script>
+  document.documentElement.style.display = 'none';
+  document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+      document.documentElement.style.display = '';
+    } else {
+      document.documentElement.style.display = '';
+      document.body.innerHTML = '<div style="display:flex; height:100vh; width:100vw; background:#18181b; color:white; align-items:center; justify-content:center; flex-direction:column; font-family:sans-serif; padding: 20px; box-sizing: border-box;"><h2 style="margin-bottom:20px;">Admin Login</h2><input type="password" id="pwd-input" placeholder="Password" style="padding:12px; font-size:16px; border-radius:6px; border:none; margin-bottom:15px; width:100%; max-width:300px; color:#000;"><button id="pwd-btn" style="padding:12px 20px; font-size:16px; cursor:pointer; background:#2563eb; color:white; border:none; border-radius:6px; width:100%; max-width:300px; font-weight:bold;">Masuk</button><a href="index.html" style="margin-top:20px; color:#aaa; text-decoration:none; font-size:14px;">Kembali</a></div>';
+      document.getElementById('pwd-btn').onclick = function() {
+        if (document.getElementById('pwd-input').value === 'kalamales') {
+          sessionStorage.setItem('admin_auth', 'true');
+          window.location.reload();
+        } else { alert('Password salah!'); }
+      };
+    }
+  });
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ruteu. Admin - TCX Naturalizer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>R</text></svg>">
+  <style>
+    :root { --bg:#0a0a0f; --surface:#141420; --surface-2:#1c1c2e; --border:#2a2a3e; --border-hover:#3a3a55; --text:#e8e8f0; --text-muted:#8888aa; --text-dim:#555570; --primary:#3b82f6; --success:#22c55e; --warning:#f59e0b; --danger:#ef4444; --info:#06b6d4; --accent-green:#10b981; --accent-purple:#8b5cf6; --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+    .page-wrapper{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+    .header-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+    .header-bar h1{font-size:1.3rem;font-weight:700;letter-spacing:-0.5px}
+    .header-bar h1 span{color:var(--primary)}
+    .back-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:8px 16px;border-radius:8px;cursor:pointer;text-decoration:none;font-weight:500;font-size:0.85rem;transition:all 0.2s}
+    .back-btn:hover{background:var(--surface-2);border-color:var(--border-hover);color:var(--text)}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;transition:border-color 0.2s}
+    .card:hover{border-color:var(--border-hover)}
+    .card-title{font-size:0.95rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:48px 20px;text-align:center;cursor:pointer;transition:all 0.25s;background:rgba(255,255,255,0.01)}
+    .upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:rgba(59,130,246,0.04)}
+    .upload-zone .icon{font-size:2.5rem;margin-bottom:12px}
+    .upload-zone h3{font-size:1rem;margin-bottom:4px}
+    .upload-zone p{color:var(--text-muted);font-size:0.85rem}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-weight:500;font-size:0.82rem;margin-bottom:6px;color:var(--text-muted)}
+    .form-group select,.form-group input{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:0.9rem;transition:all 0.2s;appearance:auto;-webkit-appearance:menulist;min-height:44px}
+    .form-group select:focus,.form-group input:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:var(--font);font-size:0.9rem}
+    .btn-block{width:100%}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent-purple));color:white}
+    .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 25px rgba(59,130,246,0.3)}
+    .btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .btn-success{background:linear-gradient(135deg,var(--success),var(--accent-green));color:white}
+    .btn-success:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 25px rgba(34,197,94,0.3)}
+    .issue-list{list-style:none}
+    .issue-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:8px;margin-bottom:8px;font-size:0.88rem;line-height:1.5}
+    .issue-item.warning{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--warning)}
+    .issue-item.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--danger)}
+    .issue-item.info{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);color:var(--info)}
+    .issue-item.success{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);color:var(--success)}
+    .issue-icon{font-size:1rem;flex-shrink:0;margin-top:2px}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+    .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+    .stat-box .label{font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
+    .stat-box .value{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .stat-box .unit{font-size:0.7rem;color:var(--text-muted)}
+    .stat-box.changed .value{color:var(--warning)}
+    .hidden{display:none!important}
+    .divider{height:1px;background:var(--border);margin:20px 0}
+    .progress-bar-track{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:12px}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent-purple));border-radius:3px;transition:width 0.4s ease}
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div class="header-bar">
+    <h1>&#x1f9ec; TCX <span>Naturalizer</span></h1>
+    <a href="foisd9.html" class="back-btn">&#x2190; Back to Forge</a>
+  </div>
+
+  <div class="card" id="step-upload">
+    <div class="card-title"><span>&#x1f4c2;</span> Upload File TCX</div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.6;">
+      Upload file .tcx hasil generate atau dari Strava. Tool ini akan menganalisa dan menormalisasi data agar terlihat natural seperti manusia sungguhan berolahraga.
+    </p>
+    <input type="file" id="file-input" accept=".tcx" class="hidden">
+    <div class="upload-zone" id="upload-zone">
+      <div class="icon">&#x1f3cb;&#xfe0f;</div>
+      <h3>Pilih File TCX</h3>
+      <p>Klik atau drag file .tcx ke sini</p>
+    </div>
+  </div>
+
+  <div class="card hidden" id="step-profile">
+    <div class="card-title"><span>&#x1f9d1;</span> Profil Atlet</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jenis Kelamin</label>
+        <select id="cfg-gender">
+          <option value="male">Pria</option>
+          <option value="female">Wanita</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Usia (tahun)</label>
+        <input type="number" id="cfg-age" value="28" min="15" max="80">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Berat Badan (kg)</label>
+        <input type="number" id="cfg-weight" value="70" min="35" max="150" step="0.5">
+      </div>
+      <div class="form-group">
+        <label>Level Kebugaran</label>
+        <select id="cfg-fitness">
+          <option value="beginner">Pemula (Baru mulai)</option>
+          <option value="recreational" selected>Rekreasi (2-3x/minggu)</option>
+          <option value="intermediate">Menengah (Atlet amatir)</option>
+          <option value="advanced">Mahir (Atlet kompetitif)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-analyze">&#x1f50d; Analisa &amp; Naturalisasi</button>
+    <div class="progress-bar-track hidden" id="progress-track">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="step-report">
+    <div class="card-title"><span>&#x1f4ca;</span> Laporan Analisis</div>
+    <div id="report-content"></div>
+  </div>
+
+  <div class="card hidden" id="step-download">
+    <div class="card-title"><span>&#x2705;</span> File Siap di-Download</div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+      File TCX sudah dinormalisasi. Semua anomali telah diperbaiki agar terlihat natural.
+    </p>
+    <button class="btn btn-success btn-block" id="btn-download">&#x2b07;&#xfe0f; Download TCX Naturalized</button>
+  </div>
+</div>
+
+<script src="js/tcx-parser.js"></script>
+<script src="js/tcx-generator.js"></script>
+<script src="js/route-engine.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  const PHYSIO = {
+    maxHR: (age, gender) => Math.round(208 - 0.7 * age + (gender === 'female' ? -3 : 0)),
+    speedRanges: {
+      Running: {
+        male: {
+          beginner: { avg: [2.2, 3.0], max: [3.5, 4.5], min: 1.0 },
+          recreational: { avg: [2.8, 3.8], max: [4.2, 5.5], min: 1.2 },
+          intermediate: { avg: [3.5, 4.5], max: [5.0, 6.5], min: 1.5 },
+          advanced: { avg: [4.0, 5.5], max: [6.0, 8.0], min: 2.0 },
+        },
+        female: {
+          beginner: { avg: [1.8, 2.6], max: [3.0, 4.0], min: 0.8 },
+          recreational: { avg: [2.4, 3.3], max: [3.8, 5.0], min: 1.0 },
+          intermediate: { avg: [3.0, 4.0], max: [4.5, 6.0], min: 1.3 },
+          advanced: { avg: [3.5, 5.0], max: [5.5, 7.5], min: 1.8 },
+        }
+      },
+      Biking: {
+        male: {
+          beginner: { avg: [4.0, 6.0], max: [8.0, 11.0], min: 1.5 },
+          recreational: { avg: [5.5, 7.5], max: [10.0, 14.0], min: 2.0 },
+          intermediate: { avg: [7.0, 9.5], max: [12.0, 17.0], min: 3.0 },
+          advanced: { avg: [8.5, 12.0], max: [14.0, 22.0], min: 4.0 },
+        },
+        female: {
+          beginner: { avg: [3.5, 5.5], max: [7.0, 10.0], min: 1.2 },
+          recreational: { avg: [4.5, 6.5], max: [9.0, 13.0], min: 1.8 },
+          intermediate: { avg: [6.0, 8.5], max: [11.0, 16.0], min: 2.5 },
+          advanced: { avg: [7.5, 11.0], max: [13.0, 20.0], min: 3.5 },
+        }
+      },
+      Walking: {
+        male: {
+          beginner: { avg: [1.0, 1.4], max: [1.8, 2.2], min: 0.5 },
+          recreational: { avg: [1.2, 1.6], max: [2.0, 2.5], min: 0.6 },
+          intermediate: { avg: [1.4, 1.8], max: [2.2, 2.8], min: 0.7 },
+          advanced: { avg: [1.6, 2.0], max: [2.5, 3.2], min: 0.8 },
+        },
+        female: {
+          beginner: { avg: [0.9, 1.3], max: [1.6, 2.0], min: 0.4 },
+          recreational: { avg: [1.1, 1.5], max: [1.8, 2.3], min: 0.5 },
+          intermediate: { avg: [1.3, 1.7], max: [2.0, 2.6], min: 0.6 },
+          advanced: { avg: [1.5, 1.9], max: [2.3, 3.0], min: 0.7 },
+        }
+      }
+    },
+    cadenceRanges: {
+      Running: { min: 150, max: 200, typical: [165, 185] },
+      Walking: { min: 80, max: 140, typical: [100, 120] },
+      Biking: { min: 50, max: 120, typical: [75, 100] },
+    },
+    powerWkg: {
+      male: { beginner: [1.0, 2.0], recreational: [1.8, 2.8], intermediate: [2.5, 3.5], advanced: [3.2, 5.0] },
+      female: { beginner: [0.8, 1.5], recreational: [1.3, 2.2], intermediate: [2.0, 3.0], advanced: [2.8, 4.2] }
+    }
+  };
+
+  let rawXml = '', parsedData = null, originalTps = [], fixedTps = [], issues = [], sport = 'Biking';
+  const $ = id => document.getElementById(id);
+
+  function init() {
+    const zone = upload-zone, fileInput = file-input;
+    zone.addEventListener('click', () => fileInput.click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', e => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+    btn-analyze.addEventListener('click', runAnalysis);
+    btn-download.addEventListener('click', downloadFixed);
+  }
+
+  function handleFile(file) {
+    if (!file.name.endsWith('.tcx')) { alert('File harus .tcx'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        rawXml = e.target.result;
+        parsedData = TCXParser.parse(rawXml);
+        originalTps = TCXParser.getAllTrackpoints(parsedData);
+        sport = parsedData.activities[0] ? parsedData.activities[0].sport : 'Biking';
+        if (originalTps.length < 5) throw new Error('Tidak cukup trackpoint.');
+        upload-zone.innerHTML = '<div class="icon">&#x2705;</div><h3>' + file.name + '</h3><p>' + originalTps.length + ' trackpoints &bull; ' + sport + '</p>';
+        step-profile.classList.remove('hidden');
+      } catch (err) { alert('Gagal parse: ' + err.message); }
+    };
+    reader.readAsText(file);
+  }
+
+  function runAnalysis() {
+    const gender = cfg-gender.value, age = parseInt(cfg-age.value) || 28;
+    const weight = parseFloat(cfg-weight.value) || 70, fitness = cfg-fitness.value;
+    issues = [];
+    fixedTps = originalTps.map(tp => ({ ...tp, position: tp.position ? { ...tp.position } : null }));
+    const maxHR = PHYSIO.maxHR(age, gender);
+    const ranges = (PHYSIO.speedRanges[sport] || PHYSIO.speedRanges.Biking)[gender][fitness];
+    const cadenceRange = PHYSIO.cadenceRanges[sport] || PHYSIO.cadenceRanges.Biking;
+
+    progress-track.classList.remove('hidden');
+    progress-fill.style.width = '10%';
+
+    setTimeout(() => {
+      analyzeSpeed(fixedTps, ranges);
+      progress-fill.style.width = '30%';
+      setTimeout(() => {
+        analyzeHeartRate(fixedTps, maxHR, age, gender, fitness);
+        progress-fill.style.width = '55%';
+        setTimeout(() => {
+          analyzeCadence(fixedTps, cadenceRange);
+          if (sport === 'Biking') analyzePower(fixedTps, weight, gender, fitness);
+          progress-fill.style.width = '75%';
+          setTimeout(() => {
+            smoothTimestamps(fixedTps);
+            progress-fill.style.width = '90%';
+            setTimeout(() => {
+              renderReport(maxHR, ranges, cadenceRange, weight, gender, fitness);
+              progress-fill.style.width = '100%';
+              setTimeout(() => {
+                progress-track.classList.add('hidden');
+                step-report.classList.remove('hidden');
+                step-download.classList.remove('hidden');
+              }, 300);
+            }, 150);
+          }, 150);
+        }, 150);
+      }, 150);
+    }, 150);
+  }
+
+  function analyzeSpeed(tps, ranges) {
+    let fixedCount = 0;
+    const maxSpeedMs = ranges.max[1], minSpeedMs = ranges.min;
+    for (let i = 1; i < tps.length; i++) {
+      if (!tps[i].position || !tps[i-1].position) continue;
+      const dist = haversine(tps[i-1].position, tps[i].position);
+      let dt = timeDiff(tps[i-1], tps[i]); if (dt <= 0) dt = 1;
+      let speedMs = dist / (dt / 1000);
+      let tpSpeed = tps[i].speed || 0;
+      if (speedMs > maxSpeedMs * 1.15 || tpSpeed > maxSpeedMs * 1.15) {
+        const cappedSpeed = maxSpeedMs * (0.85 + Math.random() * 0.15);
+        tps[i].speed = Math.round(cappedSpeed * 1000) / 1000;
+        if (dist > 0) {
+          const newDt = (dist / cappedSpeed) * 1000;
+          tps[i].time = new Date(new Date(tps[i-1].time).getTime() + newDt).toISOString().replace('.000Z', 'Z');
+        }
+        fixedCount++;
+      }
+      if (tps[i].speed !== null && tps[i].speed !== undefined) {
+        const jitter = (Math.random() - 0.5) * 0.12 * tps[i].speed;
+        tps[i].speed = Math.max(minSpeedMs * 0.5, tps[i].speed + jitter);
+        tps[i].speed = Math.round(tps[i].speed * 1000) / 1000;
+      }
+    }
+    issues.push(fixedCount > 0
+      ? { type: 'warning', text: fixedCount + ' titik kecepatan tidak manusiawi dipotong (max ' + (maxSpeedMs * 3.6).toFixed(1) + ' km/h).' }
+      : { type: 'success', text: 'Kecepatan sudah dalam rentang normal.' });
+  }
+
+  function analyzeHeartRate(tps, maxHR, age, gender, fitness) {
+    let hasHR = tps.some(tp => tp.heartRateBpm != null);
+    if (!hasHR) {
+      issues.push({ type: 'info', text: 'Tidak ada HR. Menambahkan HR realistis...' });
+      const restingHR = gender === 'male' ? (fitness === 'advanced' ? 52 : fitness === 'intermediate' ? 58 : fitness === 'recreational' ? 64 : 72) : (fitness === 'advanced' ? 56 : fitness === 'intermediate' ? 62 : fitness === 'recreational' ? 68 : 76);
+      const hrRange = maxHR - restingHR;
+      let smoothHR = restingHR + hrRange * 0.15;
+      const maxSpeedRef = (PHYSIO.speedRanges[sport] || PHYSIO.speedRanges.Biking)[gender][fitness].max[1];
+      for (let i = 0; i < tps.length; i++) {
+        const effort = Math.min(1.0, (tps[i].speed || 0) / maxSpeedRef);
+        const targetHR = restingHR + hrRange * (0.45 + effort * 0.50);
+        smoothHR = smoothHR * (effort > (smoothHR - restingHR) / hrRange ? 0.92 : 0.96) + targetHR * (effort > (smoothHR - restingHR) / hrRange ? 0.08 : 0.04);
+        const drift = 1 + 0.05 * (i / tps.length);
+        const noise = (Math.random() - 0.5) * 4;
+        tps[i].heartRateBpm = Math.round(Math.min(maxHR, Math.max(restingHR - 5, smoothHR * drift + noise)));
+      }
+      return;
+    }
+    let fixedHR = 0;
+    for (let i = 0; i < tps.length; i++) {
+      if (tps[i].heartRateBpm == null) continue;
+      if (tps[i].heartRateBpm > maxHR + 5) { tps[i].heartRateBpm = maxHR - Math.floor(Math.random() * 5); fixedHR++; }
+      else if (tps[i].heartRateBpm < 35) { tps[i].heartRateBpm = (i > 0 && tps[i-1].heartRateBpm ? tps[i-1].heartRateBpm : 70) - Math.floor(Math.random() * 3); fixedHR++; }
+      if (i > 0 && tps[i-1].heartRateBpm && Math.abs(tps[i].heartRateBpm - tps[i-1].heartRateBpm) > 30) {
+        tps[i].heartRateBpm = Math.round(tps[i-1].heartRateBpm + (tps[i].heartRateBpm > tps[i-1].heartRateBpm ? 1 : -1) * (3 + Math.random() * 5));
+        fixedHR++;
+      }
+    }
+    issues.push(fixedHR > 0
+      ? { type: 'warning', text: fixedHR + ' titik HR anomali diperbaiki (max ' + maxHR + ' bpm).' }
+      : { type: 'success', text: 'Data Heart Rate normal.' });
+  }
+
+  function analyzeCadence(tps, cadenceRange) {
+    let hasCad = tps.some(tp => tp.cadence != null || tp.runCadence != null);
+    if (!hasCad) { issues.push({ type: 'info', text: 'Tidak ada data Cadence (opsional).' }); return; }
+    let fixed = 0;
+    for (let i = 0; i < tps.length; i++) {
+      const cad = tps[i].cadence || tps[i].runCadence || 0;
+      if (cad > 0 && (cad < cadenceRange.min * 0.7 || cad > cadenceRange.max * 1.2)) {
+        const target = cadenceRange.typical[0] + Math.random() * (cadenceRange.typical[1] - cadenceRange.typical[0]);
+        if (tps[i].cadence != null) tps[i].cadence = Math.round(target);
+        if (tps[i].runCadence != null) tps[i].runCadence = Math.round(target);
+        fixed++;
+      }
+    }
+    issues.push(fixed > 0 ? { type: 'warning', text: fixed + ' Cadence di luar rentang diperbaiki.' } : { type: 'success', text: 'Data Cadence normal.' });
+  }
+
+  function analyzePower(tps, weight, gender, fitness) {
+    let hasPower = tps.some(tp => tp.power != null);
+    if (!hasPower) { issues.push({ type: 'info', text: 'Tidak ada data Power.' }); return; }
+    const wkg = PHYSIO.powerWkg[gender][fitness], maxW = wkg[1] * weight * 1.3;
+    let fixed = 0;
+    for (let i = 0; i < tps.length; i++) {
+      if (tps[i].power == null) continue;
+      if (tps[i].power > maxW) { tps[i].power = Math.round(maxW * (0.8 + Math.random() * 0.2)); fixed++; }
+      else if (tps[i].power < 0) { tps[i].power = 0; fixed++; }
+    }
+    issues.push(fixed > 0 ? { type: 'warning', text: fixed + ' Power anomali diperbaiki (max ' + Math.round(maxW) + 'W).' } : { type: 'success', text: 'Data Power normal.' });
+  }
+
+  function smoothTimestamps(tps) {
+    let fixed = 0;
+    for (let i = 1; i < tps.length; i++) {
+      const prev = new Date(tps[i-1].time).getTime(), curr = new Date(tps[i].time).getTime();
+      if (isNaN(prev) || isNaN(curr)) continue;
+      if (curr - prev < 0) { tps[i].time = new Date(prev + 1000).toISOString().replace('.000Z', 'Z'); fixed++; }
+      if (curr - prev > 300000 && tps[i].speed && tps[i].speed > 0.5) {
+        const dist = (tps[i].position && tps[i-1].position) ? haversine(tps[i-1].position, tps[i].position) : 0;
+        if (dist > 0 && dist < 500) { tps[i].time = new Date(prev + Math.min((dist / (tps[i].speed || 2)) * 1000, 10000)).toISOString().replace('.000Z', 'Z'); fixed++; }
+      }
+    }
+    if (fixed > 0) issues.push({ type: 'warning', text: fixed + ' timestamp anomali diperbaiki.' });
+  }
+
+  function renderReport(maxHR, ranges, cadenceRange, weight, gender, fitness) {
+    let html = '<div class="report-section"><h4>Temuan &amp; Perbaikan</h4><ul class="issue-list">';
+    for (const issue of issues) {
+      const icon = issue.type === 'success' ? '&#x2705;' : issue.type === 'warning' ? '&#x26a0;&#xfe0f;' : issue.type === 'danger' ? '&#x274c;' : '&#x2139;&#xfe0f;';
+      html += '<li class="issue-item ' + issue.type + '"><span class="issue-icon">' + icon + '</span><span>' + issue.text + '</span></li>';
+    }
+    html += '</ul></div><div class="divider"></div>';
+
+    const origS = computeStats(originalTps), fixS = computeStats(fixedTps);
+    html += '<div class="report-section"><h4>Perbandingan Sebelum &amp; Sesudah</h4><div class="stat-grid">';
+    html += statBox('Avg Speed', origS.avgSpeedKmh.toFixed(1), fixS.avgSpeedKmh.toFixed(1), 'km/h');
+    html += statBox('Max Speed', origS.maxSpeedKmh.toFixed(1), fixS.maxSpeedKmh.toFixed(1), 'km/h');
+    html += statBox('Avg HR', origS.avgHR ? origS.avgHR.toFixed(0) : '--', fixS.avgHR ? fixS.avgHR.toFixed(0) : '--', 'bpm');
+    html += statBox('Max HR', origS.maxHR ? origS.maxHR.toFixed(0) : '--', fixS.maxHR ? fixS.maxHR.toFixed(0) : '--', 'bpm');
+    html += statBox('Duration', formatTime(origS.totalTimeSec), formatTime(fixS.totalTimeSec), '');
+    html += statBox('Distance', origS.distKm.toFixed(2), fixS.distKm.toFixed(2), 'km');
+    html += '</div></div><div class="divider"></div>';
+    html += '<div class="report-section"><h4>Referensi Profil</h4><div style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;">';
+    html += '<strong>Sport:</strong> ' + sport + ' &bull; <strong>Gender:</strong> ' + gender + ' &bull; <strong>Fitness:</strong> ' + fitness + '<br>';
+    html += '<strong>Max HR (Tanaka):</strong> ' + maxHR + ' bpm<br>';
+    html += '<strong>Speed Range:</strong> ' + (ranges.avg[0]*3.6).toFixed(1) + '-' + (ranges.avg[1]*3.6).toFixed(1) + ' km/h (avg), max ' + (ranges.max[1]*3.6).toFixed(1) + ' km/h';
+    html += '</div></div>';
+    report-content.innerHTML = html;
+  }
+
+  function statBox(label, origVal, fixedVal, unit) {
+    const changed = origVal !== fixedVal;
+    return '<div class="stat-box' + (changed ? ' changed' : '') + '"><div class="label">' + label + '</div><div class="value">' + fixedVal + (changed ? ' <span style="font-size:0.55rem;color:var(--text-dim);">(was ' + origVal + ')</span>' : '') + '</div>' + (unit ? '<div class="unit">' + unit + '</div>' : '') + '</div>';
+  }
+
+  function computeStats(tps) {
+    let dist = 0, maxSpeedKmh = 0, totalHR = 0, hrCount = 0, maxHR = 0;
+    for (let i = 1; i < tps.length; i++) {
+      if (tps[i].position && tps[i-1].position) dist += haversine(tps[i-1].position, tps[i].position);
+      const spd = (tps[i].speed || 0) * 3.6;
+      if (spd > maxSpeedKmh) maxSpeedKmh = spd;
+      if (tps[i].heartRateBpm) { totalHR += tps[i].heartRateBpm; hrCount++; if (tps[i].heartRateBpm > maxHR) maxHR = tps[i].heartRateBpm; }
+    }
+    let totalTimeSec = 0;
+    try { const t0 = new Date(tps[0].time).getTime(), t1 = new Date(tps[tps.length-1].time).getTime(); if (!isNaN(t0) && !isNaN(t1)) totalTimeSec = (t1 - t0) / 1000; } catch(e) {}
+    return { distKm: dist / 1000, totalTimeSec, avgSpeedKmh: totalTimeSec > 0 ? (dist / totalTimeSec) * 3.6 : 0, maxSpeedKmh, avgHR: hrCount > 0 ? totalHR / hrCount : null, maxHR: maxHR > 0 ? maxHR : null };
+  }
+
+  function downloadFixed() {
+    const data = JSON.parse(JSON.stringify(parsedData));
+    data.activities[0].laps[0].tracks[0].trackpoints = fixedTps;
+    data.activities[0].sport = sport;
+    const tcxXml = TCXGenerator.generate(data, { sport: sport, creator: 'Strava' });
+    const blob = new Blob([tcxXml], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Naturalized_' + sport + '_Activity.tcx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function haversine(p1, p2) {
+    const R = 6371000, dLat = (p2.latitudeDegrees - p1.latitudeDegrees) * Math.PI / 180, dLon = (p2.longitudeDegrees - p1.longitudeDegrees) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(p1.latitudeDegrees * Math.PI/180) * Math.cos(p2.latitudeDegrees * Math.PI/180) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+  function timeDiff(tp1, tp2) { try { return new Date(tp2.time).getTime() - new Date(tp1.time).getTime(); } catch(e) { return 0; } }
+  function formatTime(sec) {
+    if (!sec || sec <= 0) return '--:--';
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = Math.floor(sec % 60);
+    return (h > 0 ? h + ':' : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
