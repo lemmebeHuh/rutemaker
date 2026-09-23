@@ -1274,7 +1274,7 @@ const App = (() => {
           await window.FirebaseClient.saveActivity(name, state);
           showToast('Tersimpan di Cloud!', 'success');
         } catch (e) {
-          showToast('Gagal menyimpan', 'error');
+          showToast(\'Gagal menyimpan\', \'error\'); alert(\'Simpan Error: \' + e.message); console.error(e);
         } finally {
           saveBtn.disabled = false;
           saveBtn.innerHTML = '&#128190; Save to Cloud';
@@ -1312,7 +1312,7 @@ const App = (() => {
             cloudList.appendChild(div);
           });
         } catch(e) {
-          cloudList.innerHTML = '<p style="text-align:center;color:var(--danger)">Gagal memuat data.</p>';
+          cloudList.innerHTML = \'<p style=\"text-align:center;color:var(--danger)\">Gagal memuat data: \' + e.message + \'</p>\'; console.error(e);
         }
       });
       cloudClose.addEventListener('click', () => cloudModal.style.display = 'none');
