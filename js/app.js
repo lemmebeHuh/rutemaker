@@ -1282,9 +1282,10 @@ const App = (() => {
       });
     }
 
+    console.log('binding cloudBtn:', cloudBtn, 'cloudModal:', cloudModal);
     if (cloudBtn && cloudModal) {
       cloudBtn.addEventListener('click', async () => {
-        cloudModal.style.display = 'flex';
+        cloudModal.style.display = 'flex'; console.log('cloudBtn clicked!');
         cloudList.innerHTML = '<p style="text-align:center;">Memuat data...</p>';
         try {
           if (!window.FirebaseClient) throw new Error('Firebase client not loaded');
