@@ -1257,12 +1257,12 @@ const App = (() => {
 
   
   function bindFirebaseEvents() {
-    const saveBtn = rv-save-cloud;
-    const nameInput = rv-activity-name;
-    const cloudBtn = btn-cloud-routes;
-    const cloudModal = cloud-modal;
-    const cloudClose = cloud-close;
-    const cloudList = cloud-routes-list;
+    const saveBtn = document.getElementById('rv-save-cloud');
+    const nameInput = document.getElementById('rv-activity-name');
+    const cloudBtn = document.getElementById('btn-cloud-routes');
+    const cloudModal = document.getElementById('cloud-modal');
+    const cloudClose = document.getElementById('cloud-close');
+    const cloudList = document.getElementById('cloud-routes-list');
 
     if (saveBtn) {
       saveBtn.addEventListener('click', async () => {
@@ -1325,14 +1325,14 @@ const App = (() => {
       const act = await window.FirebaseClient.getActivity(id);
       if (act) {
         state.sport = act.sport;
-        const selector = sport-selector;
+        const selector = document.getElementById('sport-selector');
         if(selector) selector.value = act.sport;
         
         state.lastGeneratedTps = act.tps;
         state.originalRoute = act.tps.map(t => [t.position.latitudeDegrees, t.position.longitudeDegrees]);
         
         updateModifiedStats(act.tps);
-        const modal = cloud-modal;
+        const modal = document.getElementById('cloud-modal');
         if (modal) modal.style.display = 'none';
         showToast('Rute berhasil dimuat!', 'success');
       }
