@@ -1,21 +1,19 @@
 /**
  * Heart Rate Engine Module
  * Generates realistic heart rate data correlated with activity speed, effort, and sport type.
- * 
+ *
  * Physiology model:
- * - HR responds to effort with a delay (~10-15 seconds)
- * - HR drifts upward over time (cardiac drift)
+ * - HR responds to effort with a delay (15-30s up, 30-60s down)
+ * - HR drifts upward over time (cardiac drift 5-8%)
  * - HR drops during stops but not instantly
- * - HR has natural beat-to-beat variability (HRV)
+ * - HR has natural beat-to-beat variability (HRV) that decreases at high effort
+ * - Micro-spikes simulate sudden efforts (hills, surges)
  * - Different zones correlate with speed/effort levels
  */
 
 const HeartRateEngine = (() => {
   'use strict';
 
-  /**
-   * Heart rate zone definitions based on max HR.
-   */
   const HR_ZONES = {
     rest: { min: 0.50, max: 0.60 },
     warmup: { min: 0.55, max: 0.65 },
@@ -25,24 +23,18 @@ const HeartRateEngine = (() => {
     max: { min: 0.90, max: 1.00 },
   };
 
-  /**
-   * Default speed-to-effort profiles per sport (m/s → effort 0-1).
-   */
   const EFFORT_PROFILES = {
     Biking: {
-      // Cycling: 0 m/s = rest, 4 m/s = easy, 7 m/s = moderate, 10+ m/s = hard
       speedBreakpoints: [0, 2, 4, 6, 8, 10, 12, 15],
-      effortLevels: [0.0, 0.15, 0.30, 0.50, 0.65, 0.80, 0.90, 1.0],
+      effortLevels:     [0.0, 0.15, 0.30, 0.50, 0.65, 0.80, 0.90, 1.0],
     },
     Running: {
-      // Running: 0 = rest, 2.5 m/s = easy jog, 3.5 = moderate, 4.5+ = fast
       speedBreakpoints: [0, 1.5, 2.5, 3.0, 3.5, 4.0, 4.5, 5.5],
-      effortLevels: [0.0, 0.20, 0.40, 0.55, 0.70, 0.82, 0.92, 1.0],
+      effortLevels:     [0.0, 0.20, 0.40, 0.55, 0.70, 0.82, 0.92, 1.0],
     },
     Walking: {
-      // Walking: 0 = rest, 1.2 m/s = easy, 1.8 = brisk, 2.2+ = power walking
       speedBreakpoints: [0, 0.8, 1.2, 1.5, 1.8, 2.0, 2.2, 2.5],
-      effortLevels: [0.0, 0.15, 0.30, 0.45, 0.55, 0.65, 0.75, 0.85],
+      effortLevels:     [0.0, 0.15, 0.30, 0.45, 0.55, 0.65, 0.75, 0.85],
     },
   };
 
@@ -55,11 +47,12 @@ const HeartRateEngine = (() => {
   function generateHeartRate(trackpoints, options = {}) {
     const {
       sport = 'Biking',
-      maxHR = 190,           // User's estimated max HR
-      restingHR = 70,        // User's resting HR
-      hrResponseDelay = 12,  // Seconds for HR to respond to effort change
-      cardiacDrift = 0.03,   // 3% HR increase over duration (cardiac drift)
-      hrvAmount = 0.5,       // Heart rate variability intensity (0-1)
+      maxHR = 190,
+      restingHR = 70,
+      hrResponseDelay = 20,  // seconds for HR to respond to effort increase
+      hrRecoveryDelay = 45,  // seconds for HR to respond to effort decrease (slower)
+      cardiacDrift = 0.06,   // 6% HR increase over duration
+      hrvAmount = 0.6,
     } = options;
 
     if (trackpoints.length === 0) return [];
@@ -67,39 +60,92 @@ const HeartRateEngine = (() => {
     const hrRange = maxHR - restingHR;
     const effortProfile = EFFORT_PROFILES[sport] || EFFORT_PROFILES.Biking;
 
-    // State variables for realistic HR simulation
-    let currentHR = restingHR + hrRange * 0.1; // Start slightly above resting
-    let targetHR = currentHR;
-    const totalDuration = trackpoints.length; // rough seconds
+    // State for realistic simulation
+    let currentHR = restingHR + hrRange * 0.08;
+    let smoothedEffort = 0;
+    const totalDuration = trackpoints.length;
+
+    // Pre-compute effort array for lookahead smoothing
+    const efforts = trackpoints.map(tp => speedToEffort(tp.speed || 0, effortProfile));
+
+    // Generate random micro-spike positions (2-5% of trackpoints get a spike)
+    const spikePositions = new Set();
+    const spikeCount = Math.floor(totalDuration * (0.02 + Math.random() * 0.03));
+    for (let s = 0; s < spikeCount; s++) {
+      spikePositions.add(Math.floor(Math.random() * totalDuration));
+    }
+
+    // Gaussian random state (for correlated noise)
+    let prevNoise = 0;
 
     return trackpoints.map((tp, i) => {
       const speed = tp.speed || 0;
+      const effort = efforts[i];
 
-      // 1. Calculate target HR from current speed/effort
-      const effort = speedToEffort(speed, effortProfile);
-      const baseTargetHR = restingHR + hrRange * effortToHRFraction(effort);
+      // Smooth the effort with a moving window to prevent jagged HR
+      let windowEffort = effort;
+      const windowSize = 8;
+      let wSum = effort;
+      let wCount = 1;
+      for (let w = Math.max(0, i - windowSize); w < i; w++) {
+        wSum += efforts[w];
+        wCount++;
+      }
+      windowEffort = wSum / wCount;
 
-      // 2. Apply cardiac drift (HR gradually increases over time)
-      const driftFactor = 1 + (cardiacDrift * (i / totalDuration));
-      targetHR = baseTargetHR * driftFactor;
+      // Smooth effort transition (effort itself has inertia)
+      const effortInertia = 0.85;
+      smoothedEffort = smoothedEffort * effortInertia + windowEffort * (1 - effortInertia);
 
-      // 3. Smooth HR transition (HR doesn't change instantly)
-      const responseRate = 1 / hrResponseDelay; // How fast HR approaches target
+      // Target HR from smoothed effort
+      const baseTargetHR = restingHR + hrRange * effortToHRFraction(smoothedEffort);
+
+      // Cardiac drift: HR gradually increases (5-8% over the full duration)
+      const progress = i / totalDuration;
+      const driftMultiplier = 1 + (cardiacDrift * progress);
+      const targetHR = baseTargetHR * driftMultiplier;
+
+      // HR response with asymmetric delay (rises faster than it falls)
       if (targetHR > currentHR) {
-        // HR increases faster with high effort
-        currentHR += (targetHR - currentHR) * responseRate * (0.8 + effort * 0.4);
+        const riseRate = 1 / hrResponseDelay;
+        const effortBoost = 0.6 + smoothedEffort * 0.6;
+        currentHR += (targetHR - currentHR) * riseRate * effortBoost;
       } else {
-        // HR decreases slower (recovery is gradual)
-        currentHR += (targetHR - currentHR) * responseRate * 0.5;
+        const fallRate = 1 / hrRecoveryDelay;
+        const recoverySpeed = 0.3 + (1 - smoothedEffort) * 0.4;
+        currentHR += (targetHR - currentHR) * fallRate * recoverySpeed;
       }
 
-      // 4. Apply HRV (beat-to-beat variability)
-      const hrv = generateHRV(i, hrvAmount, effort);
+      // HRV (decreases at high effort, as per physiology)
+      const hrv = generateHRV(i, hrvAmount, smoothedEffort, prevNoise);
+      prevNoise = hrv * 0.3;
 
-      // 5. Clamp and round
-      const finalHR = Math.round(
-        Math.min(maxHR, Math.max(restingHR - 5, currentHR + hrv))
+      // Micro-spikes (sudden 5-12 bpm jumps simulating surges/hills)
+      let spike = 0;
+      if (spikePositions.has(i) && speed > 0.5) {
+        spike = 5 + Math.random() * 7;
+        // Spread the spike over a few trackpoints
+        for (let s = 1; s <= 3 && i + s < totalDuration; s++) {
+          spikePositions.add(i + s);
+        }
+      }
+      // Spike decay
+      if (spikePositions.has(i) && !spikePositions.has(i - 4)) {
+        spike *= 0.3;
+      }
+
+      // Add a continuous micro-jitter to prevent perfect integer quantization flatlines
+      const microJitter = (Math.random() - 0.5) * 1.5;
+
+      const rawHR = currentHR + hrv + spike + microJitter;
+      let finalHR = Math.round(
+        Math.min(maxHR, Math.max(restingHR - 5, rawHR))
       );
+      
+      // If clamped to maxHR, occasionally dip by 1 bpm so it's not a perfectly flat line
+      if (finalHR >= maxHR && Math.random() < 0.3) {
+        finalHR -= 1;
+      }
 
       return {
         ...tp,
@@ -110,36 +156,29 @@ const HeartRateEngine = (() => {
   }
 
   /**
-   * Convert speed to effort level (0-1) using sport-specific profile.
-   */
-    /**
-   * Scale heart rate data to achieve a specific average BPM while maintaining realistic variability.
-   * @param {Array} trackpoints
-   * @param {number} targetAvgBpm
+   * Scale heart rate data to achieve a specific average BPM.
    */
   function scaleToTargetHR(trackpoints, targetAvgBpm, targetMaxBpm) {
     if (trackpoints.length === 0 || !targetAvgBpm) return trackpoints;
-    
-    // Calculate current average
+
     const hrPoints = trackpoints.filter(tp => tp.heartRateBpm !== null && tp.heartRateBpm !== undefined);
     if (hrPoints.length === 0) return trackpoints;
-    
+
     let sum = 0;
     for (const tp of hrPoints) sum += tp.heartRateBpm;
     const currentAvg = sum / hrPoints.length;
-    
+
     if (currentAvg === 0) return trackpoints;
-    
+
     const diff = targetAvgBpm - currentAvg;
-    
+
     return trackpoints.map(tp => {
       if (tp.heartRateBpm === null || tp.heartRateBpm === undefined) {
         return { ...tp, position: tp.position ? { ...tp.position } : null };
       }
-      
-      // We apply the difference but keep it within realistic bounds (40 - 220)
+
       const maxAllowed = targetMaxBpm || 220;
-        const scaled = Math.round(Math.max(40, Math.min(maxAllowed, tp.heartRateBpm + diff)));
+      const scaled = Math.round(Math.max(40, Math.min(maxAllowed, tp.heartRateBpm + diff)));
       return {
         ...tp,
         position: tp.position ? { ...tp.position } : null,
@@ -156,7 +195,6 @@ const HeartRateEngine = (() => {
       return effortLevels[effortLevels.length - 1];
     }
 
-    // Linear interpolation between breakpoints
     for (let i = 1; i < speedBreakpoints.length; i++) {
       if (speed <= speedBreakpoints[i]) {
         const fraction = (speed - speedBreakpoints[i - 1]) /
@@ -169,34 +207,39 @@ const HeartRateEngine = (() => {
   }
 
   /**
-   * Convert effort (0-1) to HR fraction (0-1 of HR range).
-   * Uses a slight exponential curve because HR response isn't perfectly linear.
+   * Convert effort (0-1) to HR fraction.
+   * Non-linear: low effort produces proportionally lower HR.
    */
   function effortToHRFraction(effort) {
-    // Slightly exponential: low effort = lower HR than linear, high effort = higher
-    return 0.1 + 0.9 * Math.pow(effort, 1.15);
+    return 0.08 + 0.92 * Math.pow(effort, 1.2);
   }
 
   /**
-   * Generate heart rate variability component.
-   * At rest, HRV is higher. During intense effort, HRV decreases.
-   * @param {number} index - Trackpoint index
-   * @param {number} amount - HRV intensity (0-1)
-   * @param {number} effort - Current effort level (0-1)
-   * @returns {number} HR deviation in BPM
+   * Generate HRV with correlated noise and respiratory sinus arrhythmia.
+   * At rest, HRV is 3-8 bpm. At max effort, HRV drops to 1-2 bpm.
    */
-  function generateHRV(index, amount, effort) {
-    // HRV decreases with higher effort (physiologically accurate)
-    const hrvScale = amount * (1.5 - effort) * 2; // Max ~3 BPM at rest, ~1 BPM at max effort
+  function generateHRV(index, amount, effort, prevNoise) {
+    // HRV amplitude decreases with effort
+    const baseAmplitude = amount * (2.0 - effort * 1.3);
 
-    // Multi-frequency oscillation (respiratory sinus arrhythmia + random)
-    const respiratory = Math.sin(index / 4 * Math.PI * 2) * hrvScale * 0.5; // ~4 sec breathing cycle
-    const randomBeat = (Math.random() - 0.5) * hrvScale * 0.8;
+    // Respiratory sinus arrhythmia (~15 breaths/min at rest, ~30 at max effort)
+    const breathRate = 15 + effort * 20;
+    const breathPeriod = 60 / breathRate; // seconds per breath
+    const respiratory = Math.sin(index / breathPeriod * Math.PI * 2) * baseAmplitude * 0.6;
 
-    return respiratory + randomBeat;
+    // Random component with temporal correlation
+    const random = (Math.random() - 0.5) * baseAmplitude * 0.8;
+    const correlated = random * 0.6 + prevNoise * 0.4;
+
+    // Very occasional larger fluctuation (autonomic nervous system)
+    let autonomic = 0;
+    if (Math.random() < 0.02) {
+      autonomic = (Math.random() - 0.5) * baseAmplitude * 2.5;
+    }
+
+    return respiratory + correlated + autonomic;
   }
 
-  // Public API
   return {
     generateHeartRate,
     scaleToTargetHR,
@@ -208,4 +251,3 @@ const HeartRateEngine = (() => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = HeartRateEngine;
 }
-

@@ -135,6 +135,12 @@ const FITGenerator = (() => {
       if (tp.cadence != null) {
         msg.cadence = tp.cadence;
       }
+      if (tp.runCadence != null) {
+        msg.cadence = tp.runCadence;
+      }
+      if (tp.power != null) {
+        msg.power = tp.power;
+      }
 
       fitWriter.writeMessage("record", msg);
     });

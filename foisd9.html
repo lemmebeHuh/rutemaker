@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 
@@ -244,6 +244,33 @@
               </div>
             </div>
 
+            <!-- Cadence & Power -->
+            <div class="accordion-item">
+              <button class="accordion-header">Cadence & Power</button>
+              <div class="accordion-content">
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-cadence-enabled" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Generate Cadence</span>
+                  </label>
+                </div>
+                <div class="control-group">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ctrl-power-enabled">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Generate Power (Watts)</span>
+                  </label>
+                </div>
+                <div id="power-controls" style="display:none;">
+                  <div class="control-group" style="align-items: center;">
+                    <div class="control-label">Rider Weight (kg)</div>
+                    <input type="number" id="ctrl-rider-weight" min="40" max="150" step="1" value="72" style="width: 80px; padding: 4px; border: 1px solid var(--border-glass); border-radius: 4px; background: var(--bg-tertiary); color: var(--text-primary); text-align: center;">
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div class="control-group" style="margin-top: 15px; flex-direction: column; align-items: flex-start;">
@@ -254,7 +281,7 @@
             </select>
           </div>
           <button class="btn btn-success btn-lg btn-block btn-generate" id="btn-generate" disabled style="margin-top:10px;">
-            Generate & Download
+            Generate & Review
           </button>
         </div>
       </div>
@@ -329,6 +356,155 @@
       </div>
     </div>
   </div>
+  <!-- Review Modal (Strava-like) -->
+  <div id="review-modal" class="review-modal" style="display:none;">
+    <div class="review-modal-backdrop"></div>
+    <div class="review-modal-container">
+      <div class="review-modal-header">
+        <div class="review-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Activity Review
+        </div>
+        <button class="review-modal-close" id="btn-review-close">&times;</button>
+      </div>
+
+      <div class="review-modal-body">
+        <!-- Activity Summary (Strava-style grid) -->
+        <div class="review-section">
+          <div class="review-summary-grid">
+            <div class="review-stat">
+              <div class="review-stat-label">Jarak</div>
+              <div class="review-stat-value" id="rv-distance">--</div>
+              <div class="review-stat-unit">km</div>
+            </div>
+            <div class="review-stat">
+              <div class="review-stat-label" id="rv-pace-label">Pace Rata2</div>
+              <div class="review-stat-value" id="rv-pace">--</div>
+              <div class="review-stat-unit" id="rv-pace-unit">/km</div>
+            </div>
+            <div class="review-stat">
+              <div class="review-stat-label">Waktu Bergerak</div>
+              <div class="review-stat-value" id="rv-moving-time">--</div>
+              <div class="review-stat-unit"></div>
+            </div>
+            <div class="review-stat">
+              <div class="review-stat-label">Kenaikan Elevasi</div>
+              <div class="review-stat-value" id="rv-elevation">--</div>
+              <div class="review-stat-unit">m</div>
+            </div>
+            <div class="review-stat">
+              <div class="review-stat-label">Kalori</div>
+              <div class="review-stat-value" id="rv-calories">--</div>
+              <div class="review-stat-unit">Kal</div>
+            </div>
+            <div class="review-stat">
+              <div class="review-stat-label">Detak Jantung Rata2</div>
+              <div class="review-stat-value" id="rv-avg-hr">--</div>
+              <div class="review-stat-unit">bpm</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pace Chart -->
+        <div class="review-section">
+          <div class="review-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Pace per Kilometer
+          </div>
+          <div class="review-chart-container">
+            <canvas id="rv-pace-chart" height="120"></canvas>
+          </div>
+          <div class="review-pace-splits" id="rv-pace-splits"></div>
+        </div>
+
+        <!-- Heart Rate Section -->
+        <div class="review-section" id="rv-hr-section">
+          <div class="review-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fc5200" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Detak Jantung
+          </div>
+          <div class="review-chart-container">
+            <canvas id="rv-hr-chart" height="120"></canvas>
+          </div>
+          <div class="review-hr-stats">
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Detak Jantung Rata2</span>
+              <span class="review-hr-stat-value" id="rv-hr-avg-val">-- bpm</span>
+            </div>
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Detak Jantung Maks</span>
+              <span class="review-hr-stat-value" id="rv-hr-max-val">-- bpm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HR Zones -->
+        <div class="review-section" id="rv-zones-section">
+          <div class="review-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fc5200" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Zona Detak Jantung
+          </div>
+          <div class="review-zones" id="rv-hr-zones"></div>
+        </div>
+
+        <!-- Cadence Section -->
+        <div class="review-section" id="rv-cadence-section" style="display:none;">
+          <div class="review-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+            Cadence
+          </div>
+          <div class="review-hr-stats">
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Cadence Rata2</span>
+              <span class="review-hr-stat-value" id="rv-cadence-avg">--</span>
+            </div>
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Cadence Maks</span>
+              <span class="review-hr-stat-value" id="rv-cadence-max">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Power Section -->
+        <div class="review-section" id="rv-power-section" style="display:none;">
+          <div class="review-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Kekuatan
+          </div>
+          <div class="review-chart-container">
+            <canvas id="rv-power-chart" height="100"></canvas>
+          </div>
+          <div class="review-hr-stats">
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Kekuatan Rata2</span>
+              <span class="review-hr-stat-value" id="rv-power-avg">-- W</span>
+            </div>
+            <div class="review-hr-stat">
+              <span class="review-hr-stat-label">Kekuatan Maks</span>
+              <span class="review-hr-stat-value" id="rv-power-max">-- W</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warnings -->
+        <div class="review-section" id="rv-warnings-section" style="display:none;">
+          <div class="review-section-title" style="color:#f59e0b;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Peringatan Realisme
+          </div>
+          <div id="rv-warnings-list" class="review-warnings-list"></div>
+        </div>
+      </div>
+
+      <div class="review-modal-footer">
+        <button class="btn btn-outline" id="btn-review-back">Kembali & Sesuaikan</button>
+        <button class="btn btn-success btn-lg" id="btn-review-download">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download File
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -336,15 +512,16 @@
   <script src="js/tcx-parser.js"></script>
   <script src="js/gpx-parser.js"></script>
   <script src="js/vendor/fit-writer.js"></script>
-  <script src="js/tcx-generator.js?v=4"></script>
-  <script src="js/fit-generator.js"></script>
+  <script src="js/tcx-generator.js?v=5"></script>
+  <script src="js/fit-generator.js?v=2"></script>
   <script src="js/route-engine.js"></script>
-  <script src="js/realism-engine.js?v=4"></script>
-  <script src="js/heart-rate-engine.js?v=4"></script>
+  <script src="js/realism-engine.js?v=5"></script>
+  <script src="js/heart-rate-engine.js?v=5"></script>
+  <script src="js/cadence-engine.js"></script>
+  <script src="js/power-engine.js"></script>
   <script src="js/map-preview.js?v=4"></script>
   <script src="js/strava-api.js"></script>
   <script src="js/clone-engine.js"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/app.js?v=8"></script>
 </body>
 </html>
-
