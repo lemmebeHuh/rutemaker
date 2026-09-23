@@ -3,11 +3,23 @@
 <head>
 
 <script>
-  const pwd = prompt("Enter Admin Password:");
-  if (pwd !== "kalamales") {
-    document.write("Access Denied.");
-    window.location.href = "index.html";
-  }
+  document.documentElement.style.display = 'none';
+  document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+      document.documentElement.style.display = '';
+    } else {
+      document.documentElement.style.display = '';
+      document.body.innerHTML = '<div style="display:flex; height:100vh; width:100vw; background:#18181b; color:white; align-items:center; justify-content:center; flex-direction:column; font-family:sans-serif; padding: 20px; box-sizing: border-box;"><h2 style="margin-bottom:20px;">Admin Login</h2><input type="password" id="pwd-input" placeholder="Password" style="padding:12px; font-size:16px; border-radius:6px; border:none; margin-bottom:15px; width:100%; max-width:300px; color:#000;"><button id="pwd-btn" style="padding:12px 20px; font-size:16px; cursor:pointer; background:#2563eb; color:white; border:none; border-radius:6px; width:100%; max-width:300px; font-weight:bold;">Masuk</button><a href="index.html" style="margin-top:20px; color:#aaa; text-decoration:none; font-size:14px;">Kembali ke halaman utama</a></div>';
+      document.getElementById('pwd-btn').onclick = function() {
+        if (document.getElementById('pwd-input').value === 'kalamales') {
+          sessionStorage.setItem('admin_auth', 'true');
+          window.location.reload();
+        } else {
+          alert('Password salah!');
+        }
+      };
+    }
+  });
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
