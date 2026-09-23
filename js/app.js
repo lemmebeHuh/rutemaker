@@ -1055,6 +1055,19 @@ const App = (() => {
 
     tps = RouteEngine.scaleToTargetSpeed(tps, targetSpeedKmh);
 
+    const pauseHandling = document.getElementById('ctrl-pause-handling') ? document.getElementById('ctrl-pause-handling').value : 'auto';
+    if (pauseHandling === 'none') {
+      tps = RouteEngine.removePauses(tps);
+    }
+    
+    const maxSpeedInput = document.getElementById('ctrl-max-speed');
+    if (maxSpeedInput && maxSpeedInput.value) {
+      const maxSpeedKmh = parseFloat(maxSpeedInput.value);
+      if (maxSpeedKmh > 0) {
+        tps = RouteEngine.enforceMaxSpeed(tps, maxSpeedKmh);
+      }
+    }
+
     // Heart Rate
     if ($('ctrl-hr-enabled').checked) {
       tps = HeartRateEngine.generateHeartRate(tps, {

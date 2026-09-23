@@ -362,7 +362,77 @@ const RouteEngine = (() => {
    * @param {Array} trackpoints
    * @param {number} offsetMeters - Positive for right, negative for left
    */
-  function applyLaneOffset(trackpoints, offsetMeters) {
+  
+    function removePauses(trackpoints) {
+      if (trackpoints.length < 2) return trackpoints;
+      let newTps = [{ ...trackpoints[0] }];
+      let accumulatedPauseMs = 0;
+
+      for (let i = 1; i < trackpoints.length; i++) {
+        const prev = trackpoints[i-1];
+        const curr = trackpoints[i];
+        
+        const dist = (prev.position && curr.position) ? haversineDistance(
+          prev.position.latitudeDegrees, prev.position.longitudeDegrees,
+          curr.position.latitudeDegrees, curr.position.longitudeDegrees
+        ) : 0;
+
+        const timeDiff = new Date(curr.time).getTime() - new Date(prev.time).getTime();
+        
+        if (dist < 1 && timeDiff > 3000) {
+          accumulatedPauseMs += timeDiff;
+          continue; 
+        }
+        
+        const newTime = new Date(new Date(curr.time).getTime() - accumulatedPauseMs);
+        newTps.push({
+          ...curr,
+          time: newTime.toISOString().replace('.000Z', 'Z')
+        });
+      }
+      return newTps;
+    }
+
+    function enforceMaxSpeed(trackpoints, maxSpeedKmh) {
+      if (!maxSpeedKmh || trackpoints.length < 2) return trackpoints;
+      const maxSpeedMs = maxSpeedKmh / 3.6;
+      let newTps = [{ ...trackpoints[0] }];
+      let accumulatedTimeMs = 0;
+      
+      for (let i = 1; i < trackpoints.length; i++) {
+        const prev = newTps[i-1];
+        const curr = trackpoints[i];
+        
+        const dist = (prev.position && curr.position) ? haversineDistance(
+          prev.position.latitudeDegrees, prev.position.longitudeDegrees,
+          curr.position.latitudeDegrees, curr.position.longitudeDegrees
+        ) : 0;
+        
+        let originalDt = new Date(curr.time).getTime() - new Date(trackpoints[i-1].time).getTime();
+        if (isNaN(originalDt) || originalDt <= 0) originalDt = 1000;
+        
+        let currentSpeedMs = (dist / (originalDt / 1000));
+        let newDt = originalDt;
+        let newSpeed = curr.speed;
+        
+        if (currentSpeedMs > maxSpeedMs || (curr.speed && curr.speed > maxSpeedMs)) {
+          newDt = dist > 0 ? (dist / maxSpeedMs) * 1000 : originalDt;
+          newSpeed = maxSpeedMs;
+        }
+        
+        accumulatedTimeMs += newDt;
+        const newTime = new Date(new Date(newTps[0].time).getTime() + accumulatedTimeMs);
+        
+        newTps.push({
+          ...curr,
+          time: newTime.toISOString().replace('.000Z', 'Z'),
+          speed: newSpeed
+        });
+      }
+      return newTps;
+    }
+
+    function applyLaneOffset(trackpoints, offsetMeters) {
     if (trackpoints.length < 2 || offsetMeters === 0) return trackpoints;
 
     return trackpoints.map((tp, i) => {
@@ -417,18 +487,20 @@ const RouteEngine = (() => {
 
   // Public API
   return {
-    timeShift,
-    speedScale,
-    trimRoute,
-    reverseRoute,
-    loopRoute,
-    elevationOffset,
-    scaleToTargetSpeed,
-    generateTrackpointsFromRoute,
-    recalculateCumulativeDistance,
-    haversineDistance,
-    applyLaneOffset,
-  };
+      timeShift,
+      speedScale,
+      trimRoute,
+      reverseRoute,
+      loopRoute,
+      elevationOffset,
+      scaleToTargetSpeed,
+      generateTrackpointsFromRoute,
+      recalculateCumulativeDistance,
+      haversineDistance,
+      applyLaneOffset,
+      removePauses,
+      enforceMaxSpeed,
+    };
 })();
 
 if (typeof module !== 'undefined' && module.exports) {

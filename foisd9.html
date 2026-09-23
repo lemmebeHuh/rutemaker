@@ -134,8 +134,19 @@
                 <div class="control-group" style="align-items: center;">
                     <div class="control-label">Target Speed (km/h) / Pace (min/km)</div>
                     <input type="number" id="ctrl-target-speed" min="1" max="100" step="0.1" value="25" style="width: 80px; padding: 4px; border: 1px solid var(--border-glass); border-radius: 4px; background: var(--bg-tertiary); color: var(--text-primary); text-align: center;">
+                    </div>
+                  <div class="control-group" style="align-items: center;">
+                      <div class="control-label">Max Speed (km/h) <small style="color:var(--text-muted);">(Opt)</small></div>
+                    <input type="number" id="ctrl-max-speed" min="1" max="150" step="0.1" value="" placeholder="Auto" style="width: 80px; padding: 4px; border: 1px solid var(--border-glass); border-radius: 4px; background: var(--bg-tertiary); color: var(--text-primary); text-align: center;">
                   </div>
-              </div>
+                  <div class="control-group" style="flex-direction: column; align-items: flex-start; margin-top: 8px;">
+                      <div class="control-label" style="margin-bottom: 5px;">Pause Handling</div>
+                      <select id="ctrl-pause-handling" class="glass-input" style="width: 100%; padding: 8px;">
+                        <option value="none">No Pauses (Continuous / Race mode)</option>
+                        <option value="auto">Auto-Pause (Keep stops if GPS is stationary)</option>
+                      </select>
+                  </div>
+                </div>
             </div>
 
             <!-- Route Adjustments -->
