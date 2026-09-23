@@ -1299,16 +1299,16 @@ const App = (() => {
             div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid var(--border-glass); margin-bottom:8px;';
             const dateStr = item.createdAt.toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
             const dist = item.distance || 0;
-            div.innerHTML = 
+            div.innerHTML = `
               <div>
-                <strong></strong><br>
-                <small style="color:var(--text-muted)"> &bull;  km &bull; </small>
+                <strong>${item.name}</strong><br>
+                <small style="color:var(--text-muted)">${item.sport} &bull; ${dist.toFixed(1)} km &bull; ${dateStr}</small>
               </div>
               <div style="display:flex; gap:8px;">
-                <button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="window.loadCloudRoute('')">Muat</button>
-                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; background:var(--danger); border-color:var(--danger);" onclick="window.deleteCloudRoute('', this)">Hapus</button>
+                <button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="window.loadCloudRoute('${item.id}')">Muat</button>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; background:var(--danger); border-color:var(--danger);" onclick="window.deleteCloudRoute('${item.id}', this)">Hapus</button>
               </div>
-            ;
+            `;
             cloudList.appendChild(div);
           });
         } catch(e) {
