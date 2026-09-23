@@ -461,7 +461,7 @@ const App = (() => {
   }
 
   function populateReviewData(tps) {
-    const weightEl = document.getElementById(\'ctrl-weight\');
+    const weightEl = document.getElementById('ctrl-weight');
     const weight = weightEl && weightEl.value ? parseFloat(weightEl.value) : 72;
     const stats = calcStats(tps);
     if (!stats) return;
