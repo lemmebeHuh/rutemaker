@@ -216,14 +216,14 @@
   const $ = id => document.getElementById(id);
 
   function init() {
-    const zone = upload-zone, fileInput = file-input;
+    const zone = document.getElementById("upload-zone"), fileInput = document.getElementById("file-input");
     zone.addEventListener('click', () => fileInput.click());
     zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
     zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
     fileInput.addEventListener('change', e => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-    btn-analyze.addEventListener('click', runAnalysis);
-    btn-download.addEventListener('click', downloadFixed);
+    document.getElementById("btn-analyze").addEventListener('click', runAnalysis);
+    document.getElementById("btn-download").addEventListener('click', downloadFixed);
   }
 
   function handleFile(file) {
@@ -236,45 +236,45 @@
         originalTps = TCXParser.getAllTrackpoints(parsedData);
         sport = parsedData.activities[0] ? parsedData.activities[0].sport : 'Biking';
         if (originalTps.length < 5) throw new Error('Tidak cukup trackpoint.');
-        upload-zone.innerHTML = '<div class="icon">&#x2705;</div><h3>' + file.name + '</h3><p>' + originalTps.length + ' trackpoints &bull; ' + sport + '</p>';
-        step-profile.classList.remove('hidden');
+        document.getElementById("upload-zone").innerHTML = '<div class="icon">&#x2705;</div><h3>' + file.name + '</h3><p>' + originalTps.length + ' trackpoints &bull; ' + sport + '</p>';
+        document.getElementById("step-profile").classList.remove('hidden');
       } catch (err) { alert('Gagal parse: ' + err.message); }
     };
     reader.readAsText(file);
   }
 
   function runAnalysis() {
-    const gender = cfg-gender.value, age = parseInt(cfg-age.value) || 28;
-    const weight = parseFloat(cfg-weight.value) || 70, fitness = cfg-fitness.value;
+    const gender = document.getElementById("cfg-gender").value, age = parseInt(document.getElementById("cfg-age").value) || 28;
+    const weight = parseFloat(document.getElementById("cfg-weight").value) || 70, fitness = document.getElementById("cfg-fitness").value;
     issues = [];
     fixedTps = originalTps.map(tp => ({ ...tp, position: tp.position ? { ...tp.position } : null }));
     const maxHR = PHYSIO.maxHR(age, gender);
     const ranges = (PHYSIO.speedRanges[sport] || PHYSIO.speedRanges.Biking)[gender][fitness];
     const cadenceRange = PHYSIO.cadenceRanges[sport] || PHYSIO.cadenceRanges.Biking;
 
-    progress-track.classList.remove('hidden');
-    progress-fill.style.width = '10%';
+    document.getElementById("progress-track").classList.remove('hidden');
+    document.getElementById("progress-fill").style.width = '10%';
 
     setTimeout(() => {
       analyzeSpeed(fixedTps, ranges);
-      progress-fill.style.width = '30%';
+      document.getElementById("progress-fill").style.width = '30%';
       setTimeout(() => {
         analyzeHeartRate(fixedTps, maxHR, age, gender, fitness);
-        progress-fill.style.width = '55%';
+        document.getElementById("progress-fill").style.width = '55%';
         setTimeout(() => {
           analyzeCadence(fixedTps, cadenceRange);
           if (sport === 'Biking') analyzePower(fixedTps, weight, gender, fitness);
-          progress-fill.style.width = '75%';
+          document.getElementById("progress-fill").style.width = '75%';
           setTimeout(() => {
             smoothTimestamps(fixedTps);
-            progress-fill.style.width = '90%';
+            document.getElementById("progress-fill").style.width = '90%';
             setTimeout(() => {
               renderReport(maxHR, ranges, cadenceRange, weight, gender, fitness);
-              progress-fill.style.width = '100%';
+              document.getElementById("progress-fill").style.width = '100%';
               setTimeout(() => {
-                progress-track.classList.add('hidden');
-                step-report.classList.remove('hidden');
-                step-download.classList.remove('hidden');
+                document.getElementById("progress-track").classList.add('hidden');
+                document.getElementById("step-report").classList.remove('hidden');
+                document.getElementById("step-download").classList.remove('hidden');
               }, 300);
             }, 150);
           }, 150);
@@ -410,7 +410,7 @@
     html += '<strong>Max HR (Tanaka):</strong> ' + maxHR + ' bpm<br>';
     html += '<strong>Speed Range:</strong> ' + (ranges.avg[0]*3.6).toFixed(1) + '-' + (ranges.avg[1]*3.6).toFixed(1) + ' km/h (avg), max ' + (ranges.max[1]*3.6).toFixed(1) + ' km/h';
     html += '</div></div>';
-    report-content.innerHTML = html;
+    document.getElementById("report-content").innerHTML = html;
   }
 
   function statBox(label, origVal, fixedVal, unit) {
