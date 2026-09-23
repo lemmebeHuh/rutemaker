@@ -1332,7 +1332,35 @@ const App = (() => {
         state.lastGeneratedTps = act.tps;
         state.originalRoute = act.tps.filter(t => t.position).map(t => [t.position.latitudeDegrees, t.position.longitudeDegrees]);
         
-        updateModifiedStats(act.tps);
+        const tps = act.tps;
+        const stats = calcStats(tps);
+        if (stats) {
+          const setHtml = (i, h) => { const el = document.getElementById(i); if (el) el.innerHTML = h; };
+          const setTxt = (i, t) => { const el = document.getElementById(i); if (el) el.textContent = t; };
+
+          setHtml('mod-distance', `${stats.distanceKm.toFixed(2)}<span class="stat-unit">km</span>`);
+          setTxt('mod-duration', formatDuration(stats.totalTimeSec));
+          setTxt('mod-moving-time', formatDuration(stats.movingTimeSec));
+          
+          const fAvg = formatSpeedUI(stats.avgSpeedKmh);
+          setHtml('mod-avg-speed', `${fAvg.val}<span class="stat-unit">${fAvg.unit}</span>`);
+          
+          if (document.getElementById('mod-max-speed')) {
+            const fMax = formatSpeedUI(stats.maxSpeedKmh);
+            setHtml('mod-max-speed', `${fMax.val}<span class="stat-unit">${fMax.unit}</span>`);
+          }
+
+          let totalHr = 0, countHr = 0;
+          tps.forEach(tp => {
+            if (tp.heartRateBpm) { totalHr += tp.heartRateBpm; countHr++; }
+          });
+          const avgHr = countHr > 0 ? Math.round(totalHr / countHr) : '--';
+          setHtml('mod-avg-hr', `${avgHr}<span class="stat-unit">bpm</span>`);
+        }
+
+        MapPreview.displayRoute(act.tps, 'modified');
+        const genBtn = document.getElementById('btn-generate');
+        if (genBtn) genBtn.disabled = false;
         const modal = document.getElementById('cloud-modal');
         if (modal) modal.style.display = 'none';
         showToast('Rute berhasil dimuat!', 'success');
