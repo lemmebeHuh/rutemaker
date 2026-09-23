@@ -431,7 +431,7 @@ const App = (() => {
     // Calculate calories to inject into the sourceData before generating TCX/FIT
     const stats = calcStats(tps);
     if (stats) {
-      sourceData.activities[0].laps[0].calories = estimateCalories(tps, stats);
+      sourceData.activities[0].laps[0].calories = estimateCalories(tps, stats, weight);
     }
 
     const deviceEl = document.getElementById('ctrl-device');
@@ -482,7 +482,7 @@ const App = (() => {
     }
 
     // Calories (estimated: HR-based or MET-based)
-    const calories = estimateCalories(tps, stats);
+    const calories = estimateCalories(tps, stats, weight);
     $('rv-calories').textContent = calories;
 
     // HR data
@@ -587,19 +587,19 @@ const App = (() => {
     return { avg: count > 0 ? Math.round(sum / count) : 0, max, count };
   }
 
-  function estimateCalories(tps, stats) {
+  function estimateCalories(tps, stats, userWeight) {
     const hrData = extractHRData(tps);
     const durationMin = stats.movingTimeSec / 60;
     if (hrData.count > 0 && hrData.avg > 0) {
       // Keytel formula (simplified)
       const hr = hrData.avg;
-      const weight = 72;
+      const weight = userWeight || 72;
       const cal = durationMin * (0.6309 * hr + 0.1988 * weight + 0.2017 * 30 - 55.0969) / 4.184;
       return Math.round(Math.max(cal, durationMin * 4));
     }
     // MET-based fallback
     const met = state.sport === 'Running' ? 9.8 : state.sport === 'Biking' ? 7.5 : 3.5;
-    return Math.round(met * 72 * (durationMin / 60));
+    return Math.round(met * weight * (durationMin / 60));
   }
 
   // --- Chart rendering (Canvas-based, Strava-style) ---
