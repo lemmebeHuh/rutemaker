@@ -1,6 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyApNJ4cnYHej55HYX_aCoian_8dJZJBLFs",
   authDomain: "kala-males.firebaseapp.com",
@@ -10,13 +7,12 @@ const firebaseConfig = {
   appId: "1:545716143530:web:55499f2706bbffe5c857d3"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 window.FirebaseClient = {
   saveActivity: async (name, state) => {
     try {
-      // Compress trackpoints by keeping only essential keys to stay well under 1MB Firestore limit
       const minifiedTps = state.lastGeneratedTps.map(tp => {
         const minTp = { 
           t: tp.time, 
@@ -32,25 +28,24 @@ window.FirebaseClient = {
         return minTp;
       });
 
-      const docRef = await addDoc(collection(db, "activities"), {
+      const docRef = await db.collection("activities").add({
         name: name || 'Unnamed Activity',
         sport: state.sport,
         distance: state.stats ? state.stats.distanceKm : 0,
         timeSec: state.stats ? state.stats.movingTimeSec : 0,
-        createdAt: serverTimestamp(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         tpsStr: JSON.stringify(minifiedTps)
       });
       return docRef.id;
     } catch (e) {
-      console.error("Error saving to Firebase: ", e);
+      console.error(e);
       throw e;
     }
   },
 
   listActivities: async () => {
     try {
-      const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
+      const snapshot = await db.collection("activities").orderBy("createdAt", "desc").get();
       const list = [];
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
@@ -65,19 +60,18 @@ window.FirebaseClient = {
       });
       return list;
     } catch (e) {
-      console.error("Error listing from Firebase: ", e);
+      console.error(e);
       throw e;
     }
   },
 
   getActivity: async (id) => {
     try {
-      const docRef = doc(db, "activities", id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
+      const docRef = db.collection("activities").doc(id);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
         const data = docSnap.data();
         const minifiedTps = JSON.parse(data.tpsStr);
-        // Reconstruct full trackpoints
         const fullTps = minifiedTps.map(minTp => {
           const tp = {
             time: minTp.t,
@@ -102,18 +96,18 @@ window.FirebaseClient = {
       }
       return null;
     } catch (e) {
-      console.error("Error getting activity from Firebase: ", e);
+      console.error(e);
       throw e;
     }
   },
 
   deleteActivity: async (id) => {
     try {
-      await deleteDoc(doc(db, "activities", id));
+      await db.collection("activities").doc(id).delete();
     } catch (e) {
-      console.error("Error deleting from Firebase: ", e);
+      console.error(e);
       throw e;
     }
   }
 };
-console.log("FirebaseClient initialized.");
+console.log("FirebaseClient initialized via compat API.");
