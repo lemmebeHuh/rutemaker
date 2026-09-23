@@ -415,6 +415,8 @@ const App = (() => {
   }
 
   function downloadFile() {
+    const weightEl = document.getElementById(\'ctrl-weight\');
+    const weight = weightEl && weightEl.value ? parseFloat(weightEl.value) : 72;
     const tps = state.lastGeneratedTps;
     if (!tps || tps.length === 0) return;
 
