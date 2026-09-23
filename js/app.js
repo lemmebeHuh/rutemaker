@@ -1330,7 +1330,7 @@ const App = (() => {
         if(selector) selector.value = act.sport;
         
         state.lastGeneratedTps = act.tps;
-        state.originalRoute = act.tps.map(t => [t.position.latitudeDegrees, t.position.longitudeDegrees]);
+        state.originalRoute = act.tps.filter(t => t.position).map(t => [t.position.latitudeDegrees, t.position.longitudeDegrees]);
         
         updateModifiedStats(act.tps);
         const modal = document.getElementById('cloud-modal');
@@ -1338,7 +1338,7 @@ const App = (() => {
         showToast('Rute berhasil dimuat!', 'success');
       }
     } catch(e) {
-      showToast('Gagal memuat rute', 'error');
+      showToast('Gagal memuat rute: ' + e.message, 'error'); console.error(e);
     }
   };
 
