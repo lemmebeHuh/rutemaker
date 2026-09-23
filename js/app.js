@@ -61,6 +61,7 @@ const App = (() => {
     bindUploadEvents();
     bindControlEvents();
     bindGenerateEvent();
+      bindFirebaseEvents();
     bindDrawModeEvents();
     bindAccordion();
     bindReviewModal();
@@ -1253,6 +1254,107 @@ const App = (() => {
     t.className = `toast ${type}`; i.textContent = type === 'success' ? '✓' : '✕'; m.textContent = msg;
     t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
   }
+
+  
+  function bindFirebaseEvents() {
+    const saveBtn = rv-save-cloud;
+    const nameInput = rv-activity-name;
+    const cloudBtn = btn-cloud-routes;
+    const cloudModal = cloud-modal;
+    const cloudClose = cloud-close;
+    const cloudList = cloud-routes-list;
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', async () => {
+        if (!window.FirebaseClient) { showToast('Firebase belum siap', 'error'); return; }
+        const name = nameInput.value.trim() || 'Rute Tanpa Nama';
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Menyimpan...';
+        try {
+          await window.FirebaseClient.saveActivity(name, state);
+          showToast('Tersimpan di Cloud!', 'success');
+        } catch (e) {
+          showToast('Gagal menyimpan', 'error');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '&#128190; Save to Cloud';
+        }
+      });
+    }
+
+    if (cloudBtn && cloudModal) {
+      cloudBtn.addEventListener('click', async () => {
+        cloudModal.style.display = 'flex';
+        cloudList.innerHTML = '<p style="text-align:center;">Memuat data...</p>';
+        try {
+          if (!window.FirebaseClient) throw new Error('Firebase client not loaded');
+          const list = await window.FirebaseClient.listActivities();
+          cloudList.innerHTML = '';
+          if (list.length === 0) {
+            cloudList.innerHTML = '<p style="text-align:center;">Belum ada rute tersimpan.</p>';
+            return;
+          }
+          list.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid var(--border-glass); margin-bottom:8px;';
+            const dateStr = item.createdAt.toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
+            const dist = item.distance || 0;
+            div.innerHTML = 
+              <div>
+                <strong></strong><br>
+                <small style="color:var(--text-muted)"> &bull;  km &bull; </small>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="window.loadCloudRoute('')">Muat</button>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; background:var(--danger); border-color:var(--danger);" onclick="window.deleteCloudRoute('', this)">Hapus</button>
+              </div>
+            ;
+            cloudList.appendChild(div);
+          });
+        } catch(e) {
+          cloudList.innerHTML = '<p style="text-align:center;color:var(--danger)">Gagal memuat data.</p>';
+        }
+      });
+      cloudClose.addEventListener('click', () => cloudModal.style.display = 'none');
+    }
+  }
+
+  window.loadCloudRoute = async (id) => {
+    try {
+      showToast('Memuat rute...', 'success');
+      const act = await window.FirebaseClient.getActivity(id);
+      if (act) {
+        state.sport = act.sport;
+        const selector = sport-selector;
+        if(selector) selector.value = act.sport;
+        
+        state.lastGeneratedTps = act.tps;
+        state.originalRoute = act.tps.map(t => [t.position.latitudeDegrees, t.position.longitudeDegrees]);
+        
+        updateModifiedStats(act.tps);
+        const modal = cloud-modal;
+        if (modal) modal.style.display = 'none';
+        showToast('Rute berhasil dimuat!', 'success');
+      }
+    } catch(e) {
+      showToast('Gagal memuat rute', 'error');
+    }
+  };
+
+  window.deleteCloudRoute = async (id, btn) => {
+    if(confirm('Yakin hapus rute ini?')) {
+      try {
+        btn.disabled = true;
+        await window.FirebaseClient.deleteActivity(id);
+        const row = btn.closest('div').parentElement;
+        if (row) row.remove();
+        showToast('Rute dihapus', 'success');
+      } catch(e) {
+        btn.disabled = false;
+        showToast('Gagal menghapus', 'error');
+      }
+    }
+  };
 
   document.addEventListener('DOMContentLoaded', init);
   return { init };
