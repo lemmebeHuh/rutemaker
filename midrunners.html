@@ -1,0 +1,439 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>midrunners | Jasa Joki Berkualitas</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0a0a0f;
+      --card-glass: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-1: #3b82f6;
+      --accent-2: #8b5cf6;
+      --accent-3: #ec4899;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Gradient Mesh Background */
+    .bg-mesh {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+      background: var(--bg-dark);
+    }
+    .blob {
+      position: absolute;
+      filter: blur(80px);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--accent-1); }
+    .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--accent-2); animation-delay: -5s; }
+    .blob-3 { top: 40%; left: 60%; width: 40vw; height: 40vw; background: var(--accent-3); animation-delay: -10s; opacity: 0.2; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(10vw, 15vh) scale(1.2); }
+    }
+
+    /* Main Container */
+    .container {
+      width: 100%;
+      max-width: 480px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1;
+    }
+
+    /* Profile Section */
+    .profile {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+    }
+
+    .avatar-glow {
+      position: absolute;
+      top: -5px; left: -5px; right: -5px; bottom: -5px;
+      background: linear-gradient(45deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      border-radius: 50%;
+      z-index: 0;
+      animation: spin 4s linear infinite;
+    }
+
+    .avatar {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      z-index: 1;
+      background: var(--bg-dark);
+      border: 4px solid var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 280px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Links Section */
+    .links-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .link-card {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 18px 24px;
+      background: var(--card-glass);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .link-card:nth-child(1) { animation-delay: 0.2s; }
+    .link-card:nth-child(2) { animation-delay: 0.3s; }
+    .link-card:nth-child(3) { animation-delay: 0.4s; }
+
+    .link-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+
+    .link-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+    
+    .link-card:hover::before {
+      transform: translateX(100%);
+    }
+
+    .link-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .link-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* TikTok Special Button */
+    .link-card.primary {
+      background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+      border: none;
+    }
+    .link-card.primary:hover {
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    }
+
+    /* Modals for About & Pricelist */
+    .content-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .content-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-box {
+      background: #1e1e2d;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      padding: 32px;
+      position: relative;
+      transform: translateY(40px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .content-modal.active .modal-box {
+      transform: translateY(0);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.2); }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .modal-body {
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .price-list {
+      list-style: none;
+    }
+    .price-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .price-item:last-child { border-bottom: none; }
+    .price-name { font-weight: 600; color: #fff; }
+    .price-val { color: var(--accent-1); font-weight: 700; }
+
+    /* Animations */
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* Social Icons Footer */
+    .social-footer {
+      margin-top: 48px;
+      display: flex;
+      gap: 20px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.6s;
+      opacity: 0;
+    }
+
+    .social-icon {
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .social-icon:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-mesh">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="container">
+    
+    <!-- Profile -->
+    <div class="profile">
+      <div class="avatar-container">
+        <div class="avatar-glow"></div>
+        <div class="avatar">M</div>
+      </div>
+      <h1 class="title">midrunners</h1>
+      <p class="subtitle">Jasa Joki Strava Profesional. Pelari & Pesepeda Terpercaya untuk Menjaga Streak Anda.</p>
+    </div>
+
+    <!-- Links -->
+    <div class="links-wrapper">
+      
+      <!-- Primary Action: TikTok Chat -->
+      <a href="https://www.tiktok.com/@midrunners" target="_blank" class="link-card primary">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v9a6 6 0 1 1-6-6z"></path></svg>
+        </div>
+        Cara Pesan (Direct TikTok)
+      </a>
+
+      <!-- About Modal Trigger -->
+      <a href="#" class="link-card" onclick="openModal('about-modal'); return false;">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </div>
+        Tentang Kami (About)
+      </a>
+
+      <!-- Pricelist Modal Trigger -->
+      <a href="#" class="link-card" onclick="openModal('price-modal'); return false;">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        Daftar Harga (Pricelist)
+      </a>
+      
+    </div>
+
+    <!-- Footer -->
+    <div class="social-footer">
+      <a href="https://www.tiktok.com/@midrunners" target="_blank" class="social-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v9a6 6 0 1 1-6-6z"></path></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div class="content-modal" id="about-modal" onclick="closeModal('about-modal')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal('about-modal')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h2 class="modal-title">Tentang Midrunners</h2>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px;"><strong>midrunners</strong> adalah layanan jasa joki profesional untuk aktivitas Strava Anda.</p>
+        <p style="margin-bottom: 12px;">Kami membantu Anda yang sibuk atau sedang tidak fit untuk tetap menjaga <i>streak</i>, menyelesaikan <i>challenge</i> bulanan, atau sekadar memperbaiki statistik lari dan bersepeda Anda.</p>
+        <p>Aktivitas dilakukan secara organik oleh pelari dan pesepeda sungguhan di lapangan sehingga hasilnya natural dan kredibel.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICELIST MODAL -->
+  <div class="content-modal" id="price-modal" onclick="closeModal('price-modal')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal('price-modal')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h2 class="modal-title">Daftar Harga</h2>
+      <div class="modal-body">
+        <ul class="price-list">
+          <li class="price-item">
+            <span class="price-name">Joki Lari (5K)</span>
+            <span class="price-val">Rp 25.000</span>
+          </li>
+          <li class="price-item">
+            <span class="price-name">Joki Lari (10K)</span>
+            <span class="price-val">Rp 45.000</span>
+          </li>
+          <li class="price-item">
+            <span class="price-name">Joki Sepeda (20K)</span>
+            <span class="price-val">Rp 30.000</span>
+          </li>
+          <li class="price-item">
+            <span class="price-name">Joki Sepeda (50K)</span>
+            <span class="price-val">Rp 60.000</span>
+          </li>
+          <li class="price-item">
+            <span class="price-name">Monthly Challenge</span>
+            <span class="price-val">Hubungi Kami</span>
+          </li>
+        </ul>
+        <p style="margin-top: 20px; font-size: 13px; text-align: center;">*Harga dapat berubah sesuai tingkat kesulitan (Pace / Elevasi).</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+  </script>
+</body>
+</html>
