@@ -481,8 +481,8 @@
     </div>
   </div>
 
-  <script>
-    
+  
+<script>
     function generateOrder(e) {
       e.preventDefault();
       const nama = document.getElementById('order-name').value;
@@ -492,14 +492,14 @@
       const loc = document.getElementById('order-loc').value;
       const hr = document.getElementById('order-hr').value;
 
-      const formatText = Halo midrunners! Saya ingin pesan jasa joki:
+      const formatText = `Halo midrunners! Saya ingin pesan jasa joki:
 
-Nama: 
-Target Jarak: 
-Jenis Olahraga: 
-Tanggal Aktivitas: 
-Lokasi Rute: 
-Data Heartrate: ;
+Nama: ${nama}
+Target Jarak: ${dist}
+Jenis Olahraga: ${sport}
+Tanggal Aktivitas: ${date}
+Lokasi Rute: ${loc}
+Data Heartrate: ${hr}`;
 
       document.getElementById('generated-text').innerText = formatText;
       document.getElementById('order-result').style.display = 'block';
@@ -533,20 +533,6 @@ Data Heartrate: ;
         document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
       }
     });
-
-    function copyFormat(btn) {
-      const text = "Nama: \nTarget Jarak: \nJenis Olahraga: \nTanggal Aktivitas: \nLokasi Rute: \nData Heartrate: (Ya/Tidak)";
-      navigator.clipboard.writeText(text).then(() => {
-        btn.innerText = 'Copied!';
-        btn.style.color = 'var(--accent)';
-        btn.style.borderColor = 'var(--accent)';
-        setTimeout(() => {
-          btn.innerText = 'Copy';
-          btn.style.color = 'var(--text-muted)';
-          btn.style.borderColor = 'var(--border)';
-        }, 2000);
-      });
-    }
   </script>
 </body>
 </html>
