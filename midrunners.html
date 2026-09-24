@@ -357,7 +357,8 @@
         <h2>Prosedur Pemesanan</h2>
         <p>Kirim pesan (DM) ke akun TikTok kami menggunakan format pendaftaran berikut:</p>
         
-        <div style="background: var(--bg); border: 1px solid var(--border); padding: 16px; margin: 16px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); line-height: 1.8;">
+        <div style="position: relative; background: var(--bg); border: 1px solid var(--border); padding: 16px; margin: 16px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); line-height: 1.8;">
+          <button onclick="copyFormat(this)" style="position: absolute; top: 8px; right: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Inter', sans-serif; transition: all 0.2s ease;">Copy</button>
 Nama: <br>
 Target Jarak: <br>
 Jenis Olahraga: <br>
@@ -452,6 +453,20 @@ Data Heartrate: (Ya/Tidak)
         document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
       }
     });
+
+    function copyFormat(btn) {
+      const text = "Nama: \nTarget Jarak: \nJenis Olahraga: \nTanggal Aktivitas: \nLokasi Rute: \nData Heartrate: (Ya/Tidak)";
+      navigator.clipboard.writeText(text).then(() => {
+        btn.innerText = 'Copied!';
+        btn.style.color = 'var(--accent)';
+        btn.style.borderColor = 'var(--accent)';
+        setTimeout(() => {
+          btn.innerText = 'Copy';
+          btn.style.color = 'var(--text-muted)';
+          btn.style.borderColor = 'var(--border)';
+        }, 2000);
+      });
+    }
   </script>
 </body>
 </html>
