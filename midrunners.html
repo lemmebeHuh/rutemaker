@@ -246,7 +246,22 @@
     .data-table tr:last-child td { border-bottom: none; padding-bottom: 0; }
     .data-table td.val { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
-        /* Form Styles */
+        
+    /* Minimalist Toggle */
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .2s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: var(--surface); transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Minimalist Range */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; padding: 10px 0; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; margin-top: -6px; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--border); border-radius: 2px; }
+    input[type=range]:focus { outline: none; }
+
+    /* Form Styles */
     .form-group { margin-bottom: 16px; display: flex; flex-direction: column; }
     .form-row { display: flex; gap: 12px; }
     .form-row .form-group { flex: 1; }
@@ -497,6 +512,10 @@
               <td class="val">+ Rp 5.000</td>
             </tr>
             <tr>
+              <td>Pace Elite (= 4:00)</td>
+              <td class="val">+ Rp 10.000</td>
+            </tr>
+            <tr>
               <td>Data Heartrate</td>
               <td class="val">+ Rp 5.000</td>
             </tr>
@@ -527,19 +546,50 @@
 
   
 <script>
+    function updateSportType() {
+      const sport = document.getElementById('order-sport').value;
+      const paceSlider = document.getElementById('order-pace');
+      
+      if (sport === 'Sepeda') {
+          paceSlider.min = 10;
+          paceSlider.max = 50;
+          paceSlider.step = 1;
+          if(paceSlider.value > 50 || paceSlider.value < 10) paceSlider.value = 25;
+          document.getElementById('pace-title').innerText = "Target Kecepatan";
+      } else {
+          paceSlider.min = 180; // 3:00
+          paceSlider.max = 900; // 15:00
+          paceSlider.step = 5;
+          if(paceSlider.value < 180) paceSlider.value = 330;
+          document.getElementById('pace-title').innerText = "Target Pace";
+      }
+      updatePaceVal();
+      calcPrice();
+    }
+
+    function updateDistVal() {
+      const val = document.getElementById('order-dist').value;
+      document.getElementById('dist-val').innerText = val + " KM";
+    }
+
+    function updatePaceVal() {
+      const sport = document.getElementById('order-sport').value;
+      const val = parseInt(document.getElementById('order-pace').value);
+      const display = document.getElementById('pace-val');
+      
+      if (sport === 'Sepeda') {
+          display.innerText = val + " km/h";
+      } else {
+          const m = Math.floor(val / 60);
+          const s = (val % 60).toString().padStart(2, '0');
+          display.innerText = m + ":" + s + " /km";
+      }
+    }
+
     function calcPrice() {
       const sport = document.getElementById('order-sport').value;
-      const distVal = document.getElementById('order-dist').value;
-      const customDist = parseFloat(document.getElementById('order-dist-custom').value) || 0;
-      const paceStr = document.getElementById('order-pace').value || "5:00";
-      
-      if (distVal === 'custom') {
-        document.getElementById('custom-dist-group').style.display = 'flex';
-      } else {
-        document.getElementById('custom-dist-group').style.display = 'none';
-      }
-      
-      let dist = distVal === 'custom' ? customDist : parseFloat(distVal);
+      const dist = parseFloat(document.getElementById('order-dist').value) || 0;
+      const paceVal = parseInt(document.getElementById('order-pace').value);
       
       let basePrice = 20000;
       if (dist > 20) {
@@ -547,20 +597,15 @@
       }
 
       let paceSurcharge = 0;
-      const paceMatch = paceStr.match(/^(\d+)[:\.](\d{2})/);
-      if (paceMatch) {
-         const m = parseInt(paceMatch[1]);
-         if (m < 5) {
-            paceSurcharge = 5000;
-         }
-      } else {
-         const speedMatch = paceStr.match(/(\d+)[\s]*km/i);
-         if (speedMatch) {
-            if (parseInt(speedMatch[1]) > 12) paceSurcharge = 5000;
+      if (sport !== 'Sepeda') {
+         if (paceVal <= 240) {
+            paceSurcharge = 10000; // <= 4:00
+         } else if (paceVal < 300) {
+            paceSurcharge = 5000; // < 5:00
          }
       }
 
-      const hr = document.getElementById('order-hr').value === 'Ya' ? 5000 : 0;
+      const hr = document.getElementById('order-hr').checked ? 5000 : 0;
       const total = basePrice + paceSurcharge + hr;
 
       const formatRp = (num) => 'Rp ' + num.toLocaleString('id-ID');
@@ -577,14 +622,12 @@
       
       const nama = document.getElementById('order-name').value;
       const sport = document.getElementById('order-sport').value;
-      const distVal = document.getElementById('order-dist').value;
-      const customDist = document.getElementById('order-dist-custom').value;
-      const dist = distVal === 'custom' ? customDist + ' KM' : distVal + 'K';
+      const dist = document.getElementById('dist-val').innerText;
+      const pace = document.getElementById('pace-val').innerText;
       
-      const pace = document.getElementById('order-pace').value;
       const date = document.getElementById('order-date').value;
       const loc = document.getElementById('order-loc').value;
-      const hr = document.getElementById('order-hr').value;
+      const hr = document.getElementById('order-hr').checked ? 'Ya' : 'Tidak';
       const total = document.getElementById('price-total').innerText;
 
       const formatText = `Halo midrunners! Saya ingin pesan jasa joki:
@@ -635,7 +678,9 @@ Apakah slot tersedia?`;
       }
     });
     
-    window.onload = () => calcPrice();
+    window.onload = () => {
+       updateSportType();
+    };
   </script>
 </body>
 </html>
