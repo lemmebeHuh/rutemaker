@@ -350,9 +350,15 @@
     </div>
 
     <div class="links-grid">
+      <!-- Steps Action -->
+      <button class="action-btn" onclick="openModal('steps-modal')" style="background: var(--text); color: var(--bg); border-color: var(--text);">
+        Prosedur Pemesanan
+        <span class="action-icon">&rarr;</span>
+      </button>
+
       <!-- Order Action -->
       <button class="action-btn primary" onclick="openModal('order-modal')">
-        Cara Pesan Jasa
+        Formulir Pemesanan
         <span class="action-icon">&rarr;</span>
       </button>
 
@@ -376,7 +382,32 @@
 
   </div>
 
-  <!-- HOW TO ORDER MODAL -->
+    <!-- STEPS MODAL -->
+  <div class="modal-overlay" id="steps-modal" onclick="closeModal('steps-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">Guide / Cara Pesan</span>
+        <button class="modal-close" onclick="closeModal('steps-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2>Prosedur Order.</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Proses pemesanan dilakukan sepenuhnya melalui DM TikTok resmi kami demi menjaga privasi.</p>
+        
+        <ul class="step-list">
+          <li class="step-item">Buka <strong>Formulir Pemesanan</strong> di halaman utama dan isi data aktivitas (Jarak, Pace, dll).</li>
+          <li class="step-item">Klik tombol <strong>Buat Format Pesanan</strong> dan salin (copy) teks yang dihasilkan.</li>
+          <li class="step-item">Kirim format pesanan tersebut melalui pesan (DM) ke akun TikTok <strong>@midrunners</strong>.</li>
+          <li class="step-item">Kami akan mengonfirmasi total biaya (E-Wallet/Transfer) & ketersediaan slot.</li>
+          <li class="step-item">Pilih metode penyerahan hasil: Berikan kode <strong>Login Strava</strong> Anda agar kami unggah secara langsung, ATAU kami kirimkan file <strong>.TCX</strong> untuk Anda unggah sendiri.</li>
+        </ul>
+      </div>
+      <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--border); background: var(--surface); border-radius: 0 0 4px 4px;">
+        <button onclick="closeModal('steps-modal'); openModal('order-modal')" class="btn-full" style="background: var(--accent); border: none; cursor: pointer;">Lanjut ke Formulir Pemesanan</button>
+      </div>
+    </div>
+  </div>
+
+<!-- HOW TO ORDER MODAL -->
   <div class="modal-overlay" id="order-modal" onclick="closeModal('order-modal')">
     <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 90vh; overflow-y: auto;">
       <div class="modal-header" style="position: sticky; top: 0; background: var(--surface); z-index: 10;">
