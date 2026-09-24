@@ -3,426 +3,429 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>midrunners | Jasa Joki Berkualitas</title>
+  <title>midrunners | Minimalist Directory</title>
   
-  <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-dark: #0a0a0f;
-      --card-glass: rgba(255, 255, 255, 0.03);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-1: #3b82f6;
-      --accent-2: #8b5cf6;
-      --accent-3: #ec4899;
+      --bg: #F9F9F9;
+      --surface: #FFFFFF;
+      --text: #111111;
+      --text-muted: #666666;
+      --border: #DEDEDE;
+      --accent: #1946D2;
+      --accent-hover: #1034A6;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Outfit', sans-serif;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
-      overflow-x: hidden;
+      padding-top: 60px;
     }
 
-    /* Animated Gradient Mesh Background */
-    .bg-mesh {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: -1;
-      overflow: hidden;
-      background: var(--bg-dark);
-    }
-    .blob {
+    /* Minimalist Top Nav */
+    .nav {
       position: absolute;
-      filter: blur(80px);
-      border-radius: 50%;
-      opacity: 0.4;
-      animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+      top: 0; left: 0; width: 100%;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--accent-1); }
-    .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--accent-2); animation-delay: -5s; }
-    .blob-3 { top: 40%; left: 60%; width: 40vw; height: 40vw; background: var(--accent-3); animation-delay: -10s; opacity: 0.2; }
-
-    @keyframes float {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(10vw, 15vh) scale(1.2); }
+    
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    
+    .nav-desc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     /* Main Container */
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 600px;
       padding: 40px 24px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      z-index: 1;
+      gap: 40px;
     }
 
-    /* Profile Section */
-    .profile {
-      text-align: center;
-      margin-bottom: 40px;
-      animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-
-    .avatar-container {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 20px;
-    }
-
-    .avatar-glow {
-      position: absolute;
-      top: -5px; left: -5px; right: -5px; bottom: -5px;
-      background: linear-gradient(45deg, var(--accent-1), var(--accent-2), var(--accent-3));
-      border-radius: 50%;
-      z-index: 0;
-      animation: spin 4s linear infinite;
-    }
-
-    .avatar {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      z-index: 1;
-      background: var(--bg-dark);
-      border: 4px solid var(--bg-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      font-weight: 800;
-      color: white;
-    }
-
-    .title {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-      background: linear-gradient(to right, #fff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .subtitle {
-      font-size: 15px;
-      color: var(--text-muted);
-      font-weight: 400;
-      max-width: 280px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
-
-    /* Links Section */
-    .links-wrapper {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .link-card {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      padding: 18px 24px;
-      background: var(--card-glass);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      color: var(--text-main);
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 600;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .link-card:nth-child(1) { animation-delay: 0.2s; }
-    .link-card:nth-child(2) { animation-delay: 0.3s; }
-    .link-card:nth-child(3) { animation-delay: 0.4s; }
-
-    .link-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.5s ease;
-    }
-
-    .link-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(139, 92, 246, 0.1);
+    /* Header / Hero */
+    .hero {
+      margin-bottom: 20px;
     }
     
-    .link-card:hover::before {
-      transform: translateX(100%);
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 500;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 24px;
     }
 
-    .link-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: 16px;
+    .hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    /* Action Links (Grid) */
+    .links-grid {
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-btn {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-    }
-
-    .link-icon svg {
       width: 100%;
-      height: 100%;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 4px;
     }
 
-    /* TikTok Special Button */
-    .link-card.primary {
-      background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
-      border: none;
+    .action-btn:hover {
+      border-color: var(--text);
+      background: #F4F4F4;
     }
-    .link-card.primary:hover {
-      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    
+    .action-btn.primary {
+      background: var(--accent);
+      color: #FFF;
+      border-color: var(--accent);
+    }
+    
+    .action-btn.primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
 
-    /* Modals for About & Pricelist */
-    .content-modal {
+    .action-icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+    }
+
+    /* Modals */
+    .modal-overlay {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
+      background: rgba(249, 249, 249, 0.85);
+      backdrop-filter: blur(4px);
       z-index: 100;
       align-items: center;
       justify-content: center;
       padding: 24px;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
     }
 
-    .content-modal.active {
+    .modal-overlay.active {
       display: flex;
       opacity: 1;
     }
 
-    .modal-box {
-      background: #1e1e2d;
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
       width: 100%;
-      max-width: 400px;
-      padding: 32px;
-      position: relative;
-      transform: translateY(40px);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      max-width: 480px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+      transform: translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
     }
 
-    .content-modal.active .modal-box {
+    .modal-overlay.active .modal-content {
       transform: translateY(0);
     }
 
-    .close-btn {
-      position: absolute;
-      top: 20px; right: 20px;
-      background: rgba(255,255,255,0.1);
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .modal-close {
+      background: none;
       border: none;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      color: white;
+      font-size: 20px;
       cursor: pointer;
+      color: var(--text-muted);
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body {
+      padding: 32px 24px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Typography inside Modals */
+    .modal-body h2 {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .modal-body p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Price Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    .data-table th, .data-table td {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .data-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .data-table td {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .data-table tr:last-child td { border-bottom: none; padding-bottom: 0; }
+    .data-table td.val { text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+    /* Instructions List */
+    .step-list {
+      list-style: none;
+      counter-reset: steps;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .step-item {
+      position: relative;
+      padding-left: 40px;
+      color: var(--text);
+    }
+    .step-item::before {
+      counter-increment: steps;
+      content: counter(steps);
+      position: absolute;
+      left: 0; top: 0;
+      width: 24px; height: 24px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+      background: #FAFAFA;
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .btn-full {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      text-align: center;
+      background: var(--text);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      border-radius: 4px;
       transition: background 0.2s;
     }
-    .close-btn:hover { background: rgba(255,255,255,0.2); }
+    .btn-full:hover { background: #333; }
 
-    .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 20px;
+    @media (max-width: 600px) {
+      .nav { padding: 20px; }
+      .hero h1 { font-size: 40px; }
     }
-
-    .modal-body {
-      color: var(--text-muted);
-      line-height: 1.6;
-      font-size: 15px;
-    }
-
-    .price-list {
-      list-style: none;
-    }
-    .price-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .price-item:last-child { border-bottom: none; }
-    .price-name { font-weight: 600; color: #fff; }
-    .price-val { color: var(--accent-1); font-weight: 700; }
-
-    /* Animations */
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-
-    /* Social Icons Footer */
-    .social-footer {
-      margin-top: 48px;
-      display: flex;
-      gap: 20px;
-      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.6s;
-      opacity: 0;
-    }
-
-    .social-icon {
-      color: var(--text-muted);
-      transition: color 0.2s;
-    }
-    .social-icon:hover { color: #fff; }
   </style>
 </head>
 <body>
 
-  <!-- Background -->
-  <div class="bg-mesh">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-  </div>
+  <nav class="nav">
+    <div class="nav-brand">midrunners.</div>
+    <div class="nav-desc">Service Config / 2026</div>
+  </nav>
 
   <div class="container">
     
-    <!-- Profile -->
-    <div class="profile">
-      <div class="avatar-container">
-        <div class="avatar-glow"></div>
-        <div class="avatar">M</div>
-      </div>
-      <h1 class="title">midrunners</h1>
-      <p class="subtitle">Jasa Joki Strava Profesional. Pelari & Pesepeda Terpercaya untuk Menjaga Streak Anda.</p>
+    <div class="hero">
+      <h1>Satu layanan.<br>Semua jarak.</h1>
+      <p>Midrunners adalah penyedia jasa joki aktivitas Strava profesional. Kami membantu menjaga streak dan rekor Anda dengan hasil lari dan sepeda yang otentik dan terverifikasi.</p>
     </div>
 
-    <!-- Links -->
-    <div class="links-wrapper">
+    <div class="links-grid">
+      <!-- Order Action -->
+      <button class="action-btn primary" onclick="openModal('order-modal')">
+        Cara Pesan Jasa
+        <span class="action-icon">&rarr;</span>
+      </button>
+
+      <!-- Pricelist Action -->
+      <button class="action-btn" onclick="openModal('price-modal')">
+        Lihat Daftar Harga
+        <span class="action-icon">&rarr;</span>
+      </button>
+
+      <!-- About Action -->
+      <button class="action-btn" onclick="openModal('about-modal')">
+        Tentang Eksekusi Kami
+        <span class="action-icon">&rarr;</span>
+      </button>
       
-      <!-- Primary Action: TikTok Chat -->
-      <a href="https://www.tiktok.com/@midrunners" target="_blank" class="link-card primary">
-        <div class="link-icon">
-          <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v9a6 6 0 1 1-6-6z"></path></svg>
-        </div>
-        Cara Pesan (Direct TikTok)
-      </a>
-
-      <!-- About Modal Trigger -->
-      <a href="#" class="link-card" onclick="openModal('about-modal'); return false;">
-        <div class="link-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        </div>
-        Tentang Kami (About)
-      </a>
-
-      <!-- Pricelist Modal Trigger -->
-      <a href="#" class="link-card" onclick="openModal('price-modal'); return false;">
-        <div class="link-icon">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        Daftar Harga (Pricelist)
-      </a>
-      
-    </div>
-
-    <!-- Footer -->
-    <div class="social-footer">
-      <a href="https://www.tiktok.com/@midrunners" target="_blank" class="social-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v9a6 6 0 1 1-6-6z"></path></svg>
+      <a href="https://www.tiktok.com/@midrunners" target="_blank" class="action-btn">
+        Kunjungi TikTok Kami
+        <span class="action-icon">&#8599;</span>
       </a>
     </div>
 
   </div>
 
-  <!-- ABOUT MODAL -->
-  <div class="content-modal" id="about-modal" onclick="closeModal('about-modal')">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeModal('about-modal')">
-        <svg width="18" height="18" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <h2 class="modal-title">Tentang Midrunners</h2>
+  <!-- HOW TO ORDER MODAL -->
+  <div class="modal-overlay" id="order-modal" onclick="closeModal('order-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">Info / Pemesanan</span>
+        <button class="modal-close" onclick="closeModal('order-modal')">&times;</button>
+      </div>
       <div class="modal-body">
-        <p style="margin-bottom: 12px;"><strong>midrunners</strong> adalah layanan jasa joki profesional untuk aktivitas Strava Anda.</p>
-        <p style="margin-bottom: 12px;">Kami membantu Anda yang sibuk atau sedang tidak fit untuk tetap menjaga <i>streak</i>, menyelesaikan <i>challenge</i> bulanan, atau sekadar memperbaiki statistik lari dan bersepeda Anda.</p>
-        <p>Aktivitas dilakukan secara organik oleh pelari dan pesepeda sungguhan di lapangan sehingga hasilnya natural dan kredibel.</p>
+        <h2>Prosedur Pemesanan</h2>
+        <p>Proses pemesanan dilakukan 100% melalui *Direct Message* di akun TikTok resmi kami untuk menjaga privasi.</p>
+        
+        <ul class="step-list">
+          <li class="step-item">Klik tombol di bawah untuk membuka profil TikTok <strong>@midrunners</strong>.</li>
+          <li class="step-item">Kirim pesan (DM) berisi detail pesanan: <strong>Jarak (5K/10K/20K)</strong> dan <strong>Jenis Aktivitas (Lari/Sepeda)</strong>.</li>
+          <li class="step-item">Tunggu konfirmasi ketersediaan dan instruksi pembayaran dari tim kami.</li>
+          <li class="step-item">Berikan akses (sementara) atau file TCX/GPX akan dikirimkan ke Anda setelah eksekusi selesai.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <a href="https://www.tiktok.com/@midrunners" target="_blank" class="btn-full" style="background: var(--accent);">Buka Chat TikTok Sekarang</a>
       </div>
     </div>
   </div>
 
   <!-- PRICELIST MODAL -->
-  <div class="content-modal" id="price-modal" onclick="closeModal('price-modal')">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeModal('price-modal')">
-        <svg width="18" height="18" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <h2 class="modal-title">Daftar Harga</h2>
+  <div class="modal-overlay" id="price-modal" onclick="closeModal('price-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">Specs / Harga</span>
+        <button class="modal-close" onclick="closeModal('price-modal')">&times;</button>
+      </div>
       <div class="modal-body">
-        <ul class="price-list">
-          <li class="price-item">
-            <span class="price-name">Joki Lari (5K)</span>
-            <span class="price-val">Rp 25.000</span>
-          </li>
-          <li class="price-item">
-            <span class="price-name">Joki Lari (10K)</span>
-            <span class="price-val">Rp 45.000</span>
-          </li>
-          <li class="price-item">
-            <span class="price-name">Joki Sepeda (20K)</span>
-            <span class="price-val">Rp 30.000</span>
-          </li>
-          <li class="price-item">
-            <span class="price-name">Joki Sepeda (50K)</span>
-            <span class="price-val">Rp 60.000</span>
-          </li>
-          <li class="price-item">
-            <span class="price-name">Monthly Challenge</span>
-            <span class="price-val">Hubungi Kami</span>
-          </li>
-        </ul>
-        <p style="margin-top: 20px; font-size: 13px; text-align: center;">*Harga dapat berubah sesuai tingkat kesulitan (Pace / Elevasi).</p>
+        <h2>Daftar Harga Layanan</h2>
+        <p>Harga berlaku untuk satu kali aktivitas. Custom pace atau elevasi ekstrem mungkin dikenakan biaya tambahan.</p>
+        
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Aktivitas</th>
+              <th class="val">Tarif Dasar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lari (5K)</td>
+              <td class="val">Rp 25.000</td>
+            </tr>
+            <tr>
+              <td>Lari (10K)</td>
+              <td class="val">Rp 45.000</td>
+            </tr>
+            <tr>
+              <td>Sepeda (20K)</td>
+              <td class="val">Rp 30.000</td>
+            </tr>
+            <tr>
+              <td>Sepeda (50K)</td>
+              <td class="val">Rp 60.000</td>
+            </tr>
+            <tr>
+              <td>Monthly Challenge</td>
+              <td class="val">Negosiasi</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div class="modal-overlay" id="about-modal" onclick="closeModal('about-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">System / Tentang Kami</span>
+        <button class="modal-close" onclick="closeModal('about-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2>Eksekusi Terpercaya.</h2>
+        <p>Midrunners dirancang untuk antarmuka aktivitas. Kendali presisi. Performa nyata.</p>
+        <p style="margin-bottom: 0;">Berbeda dengan joki lain, kami menggunakan instrumen pengukur detak jantung (HRM) dan metrik langkah yang selaras. Hasil eksekusi tidak akan memicu sistem deteksi anomali (flag) dari platform kebugaran, karena jejak data kami merepresentasikan kinetika pelari asli.</p>
       </div>
     </div>
   </div>
@@ -434,6 +437,13 @@
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
     }
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
+      }
+    });
   </script>
 </body>
 </html>
