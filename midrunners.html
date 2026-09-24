@@ -11,13 +11,13 @@
   
   <style>
     :root {
-      --bg: #F9F9F9;
-      --surface: #FFFFFF;
-      --text: #111111;
-      --text-muted: #666666;
-      --border: #DEDEDE;
-      --accent: #1946D2;
-      --accent-hover: #1034A6;
+      --bg: #0A0A0A;
+      --surface: #141414;
+      --text: #F0F0F0;
+      --text-muted: #888888;
+      --border: #2A2A2A;
+      --accent: #FC4C02;
+      --accent-hover: #E34402;
     }
 
     * {
@@ -117,12 +117,12 @@
 
     .action-btn:hover {
       border-color: var(--text);
-      background: #F4F4F4;
+      background: #222222;
     }
     
     .action-btn.primary {
       background: var(--accent);
-      color: #FFF;
+      color: #FFFFFF;
       border-color: var(--accent);
     }
     
@@ -141,7 +141,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(249, 249, 249, 0.85);
+      background: rgba(10, 10, 10, 0.85);
       backdrop-filter: blur(4px);
       z-index: 100;
       align-items: center;
@@ -303,7 +303,7 @@
     .modal-footer {
       padding: 20px 24px;
       border-top: 1px solid var(--border);
-      background: #FAFAFA;
+      background: #111111;
       border-radius: 0 0 4px 4px;
     }
     
@@ -313,14 +313,14 @@
       padding: 14px;
       text-align: center;
       background: var(--text);
-      color: #fff;
+      color: var(--bg);
       text-decoration: none;
       font-weight: 500;
       font-size: 14px;
       border-radius: 4px;
       transition: background 0.2s;
     }
-    .btn-full:hover { background: #333; }
+    .btn-full:hover { background: #CCCCCC; }
 
     @media (max-width: 600px) {
       .nav { padding: 16px 20px; }
