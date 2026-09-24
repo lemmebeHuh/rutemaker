@@ -386,38 +386,46 @@
       <div class="modal-body">
         <p style="margin-bottom: 24px;">Lengkapi detail pesanan Anda. Total harga akan terhitung otomatis.</p>
         
+        
         <form id="order-form" onsubmit="generateOrder(event)">
           <div class="form-group">
             <label>Nama Lengkap</label>
             <input type="text" id="order-name" required placeholder="Contoh: Budi Santoso">
           </div>
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" style="flex: 2;">
               <label>Jenis Olahraga</label>
-              <select id="order-sport" onchange="calcPrice()" required>
+              <select id="order-sport" onchange="updateSportType()" required>
                 <option value="Lari">Lari</option>
                 <option value="Sepeda">Sepeda</option>
+                <option value="Jalan">Jalan (Walk)</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>Target Jarak</label>
-              <select id="order-dist" onchange="calcPrice()" required>
-                <option value="5">5K</option>
-                <option value="10">10K</option>
-                <option value="20">20K</option>
-                <option value="50">50K</option>
-                <option value="custom">Lainnya (Custom)</option>
-              </select>
+            <div class="form-group" style="flex: 1; flex-direction: row; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 6px;">
+              <label style="margin-bottom: 0;">Heartrate (+5k)</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="order-hr" onchange="calcPrice()">
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
-          <div class="form-group" id="custom-dist-group" style="display: none;">
-            <label>Jarak Custom (KM)</label>
-            <input type="number" id="order-dist-custom" step="0.1" placeholder="Misal: 15.5" oninput="calcPrice()">
-          </div>
+          
           <div class="form-group">
-            <label>Target Pace / Kecepatan</label>
-            <input type="text" id="order-pace" oninput="calcPrice()" required placeholder="Contoh: 5:30 (jika dibawah 5:00 +5k)">
+            <div style="display: flex; justify-content: space-between;">
+              <label>Target Jarak</label>
+              <span id="dist-val" style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500;">5 KM</span>
+            </div>
+            <input type="range" id="order-dist" min="1" max="100" step="1" value="5" oninput="updateDistVal(); calcPrice()">
           </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between;">
+              <label id="pace-title">Target Pace</label>
+              <span id="pace-val" style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500;">5:30 /km</span>
+            </div>
+            <input type="range" id="order-pace" min="180" max="900" step="5" value="330" oninput="updatePaceVal(); calcPrice()">
+          </div>
+          
           <div class="form-group">
             <label>Tanggal Aktivitas</label>
             <input type="datetime-local" id="order-date" required>
@@ -426,21 +434,10 @@
             <label>Lokasi Rute (Area/Kota)</label>
             <input type="text" id="order-loc" required placeholder="Contoh: GBK / Kota Bandung">
           </div>
-          
-          <div class="form-row">
-
-            <div class="form-group">
-              <label>Data Heartrate (+5k)</label>
-              <select id="order-hr" onchange="calcPrice()">
-                <option value="Tidak">Tidak</option>
-                <option value="Ya">Ya (Grafik HR)</option>
-              </select>
-            </div>
-          </div>
 
           <!-- Live Invoice -->
           <div style="background: var(--bg); border: 1px solid var(--border); padding: 16px; margin: 16px 0; border-radius: 4px;">
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 1px;">Estimasi Biaya</div>
+            <div style="font-family: \'JetBrains Mono\', monospace; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 1px;">Estimasi Biaya</div>
             <table class="data-table" style="margin-top: 0;">
               <tbody>
                 <tr>
