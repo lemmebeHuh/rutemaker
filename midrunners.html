@@ -246,6 +246,14 @@
     .data-table tr:last-child td { border-bottom: none; padding-bottom: 0; }
     .data-table td.val { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
+        /* Form Styles */
+    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+    .form-group label { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 6px; }
+    .form-group input, .form-group select { padding: 12px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg); color: var(--text); transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+
     /* Instructions List */
     .step-list {
       list-style: none;
@@ -350,31 +358,65 @@
   <div class="modal-overlay" id="order-modal" onclick="closeModal('order-modal')">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <span class="modal-title">Info / Pemesanan</span>
+        <span class="modal-title">Info / Form Pesanan</span>
         <button class="modal-close" onclick="closeModal('order-modal')">&times;</button>
       </div>
       <div class="modal-body">
-        <h2>Prosedur Pemesanan</h2>
-        <p>Kirim pesan (DM) ke akun TikTok kami menggunakan format pendaftaran berikut:</p>
+        <p style="margin-bottom: 24px;">Isi form di bawah untuk membuat format pesanan, lalu salin dan kirimkan ke DM TikTok kami.</p>
         
-        <div style="position: relative; background: var(--bg); border: 1px solid var(--border); padding: 16px; margin: 16px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); line-height: 1.8;">
-          <button onclick="copyFormat(this)" style="position: absolute; top: 8px; right: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Inter', sans-serif; transition: all 0.2s ease;">Copy</button>
-Nama: <br>
-Target Jarak: <br>
-Jenis Olahraga: <br>
-Tanggal Aktivitas: <br>
-Lokasi Rute: <br>
-Data Heartrate: (Ya/Tidak)
+        <form id="order-form" onsubmit="generateOrder(event)">
+          <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="order-name" required placeholder="Contoh: Budi Santoso">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Jenis Olahraga</label>
+              <select id="order-sport" required>
+                <option value="Lari">Lari</option>
+                <option value="Sepeda">Sepeda</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Target Jarak</label>
+              <select id="order-dist" required>
+                <option value="5K">5K</option>
+                <option value="10K">10K</option>
+                <option value="20K">20K</option>
+                <option value="50K">50K</option>
+                <option value="Lainnya">Lainnya (Custom)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tanggal Aktivitas</label>
+            <input type="date" id="order-date" required>
+          </div>
+          <div class="form-group">
+            <label>Lokasi Rute (Area/Kota)</label>
+            <input type="text" id="order-loc" required placeholder="Contoh: GBK / Kota Bandung">
+          </div>
+          <div class="form-group">
+            <label>Data Heartrate</label>
+            <select id="order-hr" required>
+              <option value="Ya">Ya (Grafik Detak Jantung)</option>
+              <option value="Tidak">Tidak</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-full" style="background: var(--text); margin-top: 8px;">Buat Format Pesanan</button>
+        </form>
+
+        <div id="order-result" style="display: none; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px;">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Format berhasil dibuat. Silakan salin teks ini:</p>
+          <div style="position: relative; background: var(--bg); border: 1px solid var(--border); padding: 16px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); line-height: 1.8;">
+            <button onclick="copyGeneratedFormat(this)" style="position: absolute; top: 8px; right: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Inter', sans-serif; transition: all 0.2s ease;">Copy</button>
+            <div id="generated-text" style="white-space: pre-wrap;"></div>
+          </div>
         </div>
-        
-        <ul class="step-list">
-          <li class="step-item">Kami akan mengonfirmasi total biaya dan ketersediaan slot.</li>
-          <li class="step-item">Lakukan pembayaran (Transfer/E-Wallet).</li>
-          <li class="step-item">Tentukan metode pengiriman: Kirim <strong>Kode Login Strava</strong> Anda agar kami upload langsung, ATAU kami kirimkan file <strong>.TCX</strong> untuk Anda upload sendiri secara mandiri.</li>
-        </ul>
       </div>
-      <div class="modal-footer">
-        <a href="https://www.tiktok.com/@midrunners" target="_blank" class="btn-full" style="background: var(--accent);">Buka Chat TikTok Sekarang</a>
+      <div class="modal-footer" id="modal-footer-tiktok" style="display: none;">
+        <a href="https://www.tiktok.com/@midrunners" target="_blank" class="btn-full" style="background: var(--accent);">Lanjut ke DM TikTok</a>
       </div>
     </div>
   </div>
@@ -440,6 +482,44 @@ Data Heartrate: (Ya/Tidak)
   </div>
 
   <script>
+    
+    function generateOrder(e) {
+      e.preventDefault();
+      const nama = document.getElementById('order-name').value;
+      const sport = document.getElementById('order-sport').value;
+      const dist = document.getElementById('order-dist').value;
+      const date = document.getElementById('order-date').value;
+      const loc = document.getElementById('order-loc').value;
+      const hr = document.getElementById('order-hr').value;
+
+      const formatText = Halo midrunners! Saya ingin pesan jasa joki:
+
+Nama: 
+Target Jarak: 
+Jenis Olahraga: 
+Tanggal Aktivitas: 
+Lokasi Rute: 
+Data Heartrate: ;
+
+      document.getElementById('generated-text').innerText = formatText;
+      document.getElementById('order-result').style.display = 'block';
+      document.getElementById('modal-footer-tiktok').style.display = 'block';
+    }
+
+    function copyGeneratedFormat(btn) {
+      const text = document.getElementById('generated-text').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.innerText = 'Copied!';
+        btn.style.color = 'var(--accent)';
+        btn.style.borderColor = 'var(--accent)';
+        setTimeout(() => {
+          btn.innerText = 'Copy';
+          btn.style.color = 'var(--text-muted)';
+          btn.style.borderColor = 'var(--border)';
+        }, 2000);
+      });
+    }
+
     function openModal(id) {
       document.getElementById(id).classList.add('active');
     }
