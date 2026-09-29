@@ -93,6 +93,7 @@ const TCXGenerator = (() => {
         if (creatorName.includes("Edge 530")) pId = "3121";
         if (creatorName.includes("Fenix 7")) pId = "3906";
         if (creatorName.includes("245")) pId = "3146";
+        if (creatorName.includes("Forerunner 165")) pId = "4432";
         
         xml += `${i2}<Creator xsi:type="Device_t">${nl}`;
         xml += `${i2}  <Name>${escapeXml(creatorName)}</Name>${nl}`;
