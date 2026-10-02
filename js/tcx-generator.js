@@ -200,24 +200,29 @@ const TCXGenerator = (() => {
     }
 
     // Extensions (Speed, Power, RunCadence)
-    const hasSpeed = tp.speed !== null && tp.speed !== undefined;
-    const hasPower = tp.power !== null && tp.power !== undefined;
-    const hasRunCadence = tp.runCadence !== null && tp.runCadence !== undefined;
-    if (hasSpeed || hasPower || hasRunCadence) {
-      xml += `${i5}<Extensions>${nl}`;
-      xml += `${i6}<TPX xmlns="${ACTIVITY_EXT_NS}">${nl}`;
-      if (hasSpeed) {
-        xml += `${i7}<Speed>${formatDecimal(tp.speed, 1)}</Speed>${nl}`;
-      }
-      if (hasRunCadence) {
-        xml += `${i7}<RunCadence>${Math.round(tp.runCadence)}</RunCadence>${nl}`;
-      }
-      if (hasPower) {
-        xml += `${i7}<Watts>${Math.round(tp.power)}</Watts>${nl}`;
-      }
-      xml += `${i6}</TPX>${nl}`;
-      xml += `${i5}</Extensions>${nl}`;
-    }
+const hasSpeed = tp.speed !== null && tp.speed !== undefined;
+const hasPower = tp.power !== null && tp.power !== undefined;
+const hasRunCadence = tp.runCadence !== null && tp.runCadence !== undefined;
+
+if (hasSpeed || hasPower || hasRunCadence) {
+  xml += `${i5}<Extensions>${nl}`;
+  xml += `${i6}<TPX xmlns="${ACTIVITY_EXT_NS}">${nl}`;
+
+  if (hasSpeed) {
+    xml += `${i7}<Speed>${formatDecimal(tp.speed, 1)}</Speed>${nl}`;
+  }
+
+  if (hasRunCadence) {
+    xml += `${i7}<RunCadence>${Math.round(tp.runCadence / 2)}</RunCadence>${nl}`;
+  }
+
+  if (hasPower) {
+    xml += `${i7}<Watts>${Math.round(tp.power)}</Watts>${nl}`;
+  }
+
+  xml += `${i6}</TPX>${nl}`;
+  xml += `${i5}</Extensions>${nl}`;
+}
 
     xml += `${i4}</Trackpoint>${nl}`;
     return xml;
