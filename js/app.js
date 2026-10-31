@@ -92,13 +92,26 @@ const App = (() => {
     const btnSettings = $('btn-settings');
     const settingsModal = $('settings-modal');
     if (btnSettings && settingsModal) {
-      btnSettings.addEventListener('click', () => settingsModal.style.display = 'flex');
+      btnSettings.addEventListener('click', () => {
+        settingsModal.style.display = 'flex';
+        try {
+          const raw = localStorage.getItem('midrunners_admin_pricing');
+          if (raw && $('cfg-hr-mid-pace')) {
+            const parsed = JSON.parse(raw);
+            if (parsed.hrRuleMidPace) $('cfg-hr-mid-pace').value = parsed.hrRuleMidPace;
+          }
+        } catch (e) {}
+      });
       $('btn-settings-cancel').addEventListener('click', () => settingsModal.style.display = 'none');
       $('btn-settings-save').addEventListener('click', () => {
         const token = $('strava-access-token').value.trim();
         if (token) localStorage.setItem('strava_token', token);
+        if ($('cfg-hr-mid-pace')) {
+          const hrRule = $('cfg-hr-mid-pace').value;
+          localStorage.setItem('midrunners_admin_pricing', JSON.stringify({ hrRuleMidPace: hrRule }));
+        }
         settingsModal.style.display = 'none';
-        showToast('Settings saved', 'success');
+        showToast('Settings & Pricing rule saved', 'success');
       });
       const savedToken = localStorage.getItem('strava_token');
       if (savedToken) $('strava-access-token').value = savedToken;
