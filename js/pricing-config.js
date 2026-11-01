@@ -174,11 +174,11 @@
     packagePricing: {
       packages: [
         { count: 3, normalPrice: 150000, promoPrice: 150000, pricePerActivity: 50000, label: '3 Aktivitas' },
-        { count: 5, normalPrice: 250000, promoPrice: 225000, pricePerActivity: 45000, label: '5 Aktivitas' },
-        { count: 10, normalPrice: 400000, promoPrice: 380000, pricePerActivity: 38000, label: '10 Aktivitas' },
-        { count: 15, normalPrice: 600000, promoPrice: 540000, pricePerActivity: 36000, label: '15 Aktivitas' },
-        { count: 20, normalPrice: 800000, promoPrice: 680000, pricePerActivity: 34000, label: '20 Aktivitas' },
-        { count: 30, normalPrice: 1200000, promoPrice: 900000, pricePerActivity: 30000, label: '30 Aktivitas' }
+        { count: 5, normalPrice: 250000, promoPrice: 200000, pricePerActivity: 40000, label: '5 Aktivitas' },
+        { count: 10, normalPrice: 400000, promoPrice: 350000, pricePerActivity: 35000, label: '10 Aktivitas' },
+        { count: 15, normalPrice: 600000, promoPrice: 500000, pricePerActivity: 33333, label: '15 Aktivitas' },
+        { count: 20, normalPrice: 800000, promoPrice: 650000, pricePerActivity: 32500, label: '20 Aktivitas' },
+        { count: 30, normalPrice: 1200000, promoPrice: 780000, pricePerActivity: 26000, label: '30 Aktivitas' }
       ],
       benefits: [
         'Bebas request pace.',
